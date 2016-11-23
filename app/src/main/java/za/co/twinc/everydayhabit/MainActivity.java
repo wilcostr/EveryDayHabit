@@ -4,41 +4,32 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-
-import android.app.Activity;
-import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
+import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
-
-import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final String PREFS_LOG = "prefs_log";
     public static final int NUM_LOG_ENTRIES = 49;
     static final int EDIT_DAY_REQUEST = 1;
+    int streak_longest, streak_current, days_fail, days_fail_legit, days_success;
 
     private AdView mAdView;
 
@@ -53,6 +44,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        TextView textViewSuccessRate = (TextView) findViewById(R.id.textViewSuccessRate);
+        TextView textViewCurrentStreak = (TextView) findViewById(R.id.textViewCurrentStreak);
+        TextView textViewLongestStreak = (TextView) findViewById(R.id.textViewLongestStreak);
+
         //MobileAds.initialize(getApplicationContext(),"ca-app-pub-5782047288878600~9640464773");
         mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder()
@@ -66,12 +61,34 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences log = getSharedPreferences(PREFS_LOG, 0);
         for (int i = 0; i < NUM_LOG_ENTRIES; i++) {
-            int log_entry_state = log.getInt("log_entry_" + i, -1);
             log_entries[i] = log.getInt("log_entry_" + i, -1);
+
+            if (log_entries[i] == 0) {          //successful day
+                days_success ++;
+                streak_current ++;
+            }
+            else if (log_entries[i] == 1){      //Failure with no legit reason
+                days_fail ++;
+                streak_current = 0;
+            }
+            else if (log_entries[i] == 2){      //Failure with legit reason
+                days_fail_legit ++;
+                streak_current = 0;
+            }
+            if (streak_current > streak_longest) streak_longest = streak_current;
+
+
+
+//            else if (log_entries[i] == -1) days_total = i; //first day without entry
         }
+
+        textViewSuccessRate.setText(String.format("%.1f",((100.0*days_success)/(days_success+days_fail+days_fail_legit)))+"%");
+        textViewCurrentStreak.setText(""+streak_current);
+        textViewLongestStreak.setText(""+streak_longest);
 
         GridView grid = (GridView) findViewById(R.id.content_grid);
         grid.setAdapter(new ImageAdapter(this, log_entries));
+
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

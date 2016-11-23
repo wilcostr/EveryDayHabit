@@ -2,6 +2,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:context="za.co.twinc.everydayhabit.NewHabitActivity"
+    tools:showIn="@layout/activity_new_habit"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
@@ -12,8 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context="za.co.twinc.everydayhabit.NewHabitActivity"
-        tools:showIn="@layout/activity_new_habit"
         android:paddingBottom="16dp">
 
         <TextView
@@ -21,9 +21,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:id="@+id/textViewNewHabit"
-            android:textStyle="normal|bold"
-            android:gravity="start"
-            android:textSize="18sp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -38,16 +35,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/textView"
-            android:textStyle="normal|bold"
-            android:gravity="start"
-            android:textSize="18sp"
             app:layout_constraintTop_toBottomOf="@+id/textViewNewHabit"
             android:layout_marginStart="16dp"
             app:layout_constraintLeft_toLeftOf="parent"
             android:layout_marginLeft="16dp" />
 
         <EditText
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:inputType="text"
             android:ems="10"
@@ -65,7 +59,7 @@
             android:layout_marginRight="16dp" />
 
         <Button
-            android:text="Done"
+            android:text="Add Habit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/button_new_habit"

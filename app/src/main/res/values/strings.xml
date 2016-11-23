@@ -17,7 +17,7 @@
         complete. Now think of something in your daily routine that can act as a trigger for
         performing your new habit and complete the following:\n
     </string>
-    <string name="new_habit_2">Every day, I am going to\n</string>
+    <string name="new_habit_2">Every day, I am going to...\n</string>
     <string name="action_reset">Reset</string>
     <string name="action_new_habit">New Habit</string>
 
