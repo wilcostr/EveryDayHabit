@@ -7,8 +7,6 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
 
-        <item name="android:textViewStyle">@style/B18TextViewStyle</item>
-
     </style>
 
     <style name="B18TextViewStyle" parent="android:Widget.TextView">
