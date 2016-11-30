@@ -3,16 +3,14 @@ package za.co.twinc.everydayhabit;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.GridLayout;
 import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +22,14 @@ import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 public class MainActivity extends AppCompatActivity {
 
     public static final String PREFS_LOG = "prefs_log";
@@ -32,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     int streak_longest, streak_current, days_fail, days_fail_legit, days_success;
 
     private AdView mAdView;
+    private TextView textViewMotivation;
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -55,10 +62,15 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         mAdView.loadAd(adRequest);
 
+        //Initialise and load motivation text
+        textViewMotivation = (TextView) findViewById(R.id.textView_motivation);
+        loadNewMotivation();
 
+        //Set ticks for success, fail, fail_legit
         final int[] TICKS = {R.drawable.tick_green, R.drawable.tick_red, R.drawable.tick_orange_2};
         int[] log_entries = new int[NUM_LOG_ENTRIES];
 
+        //Get log_entries from PREFS_LOG and calculate stats
         SharedPreferences log = getSharedPreferences(PREFS_LOG, 0);
         for (int i = 0; i < NUM_LOG_ENTRIES; i++) {
             log_entries[i] = log.getInt("log_entry_" + i, -1);
@@ -77,24 +89,18 @@ public class MainActivity extends AppCompatActivity {
             }
             if (streak_current > streak_longest) streak_longest = streak_current;
 
-
-
-//            else if (log_entries[i] == -1) days_total = i; //first day without entry
         }
 
-        textViewSuccessRate.setText(String.format("%.1f",((100.0*days_success)/(days_success+days_fail+days_fail_legit)))+"%");
+        textViewSuccessRate.setText(String.format("%.1f",
+                ((100.0*days_success)/(days_success+days_fail+days_fail_legit)))+"%");
         textViewCurrentStreak.setText(""+streak_current);
         textViewLongestStreak.setText(""+streak_longest);
 
-        GridView grid = (GridView) findViewById(R.id.content_grid);
-        grid.setAdapter(new ImageAdapter(this, log_entries));
+        //Initialise gridContent with latest log_entries
+        GridView gridContent = (GridView) findViewById(R.id.content_grid);
+        gridContent.setAdapter(new ImageAdapter(this, log_entries));
 
-
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        gridContent.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
                 SharedPreferences log = getSharedPreferences(PREFS_LOG, 0);
@@ -105,21 +111,22 @@ public class MainActivity extends AppCompatActivity {
                 int cur_log_entry = log.getInt("log_entry_" + position, -1);
                 if ((prev_log_entry >= 0 && next_log_entry == -1) || position == 0) {
                     // Send intent to EditDayActivity
-                    Intent editDayIntent = new Intent(getApplicationContext(), EditDayActivity.class);
-                    editDayIntent.putExtra("clicked_position", position);
+                    Intent editDay = new Intent(getApplicationContext(), EditDayActivity.class);
+                    editDay.putExtra("clicked_position", position);
 
-                    startActivityForResult(editDayIntent, EDIT_DAY_REQUEST);
+                    startActivityForResult(editDay, EDIT_DAY_REQUEST);
                 } else if (next_log_entry >= 0) {
-                    String reason = log.getString("log_reason_" + position, "You were so lazy, you didn't even give a reason!");
-
+                    String reason = log.getString("log_reason_" + position,
+                            "You were so lazy, you didn't even give a reason!");
+                    //TODO: Add multiple praise rondomised
                     if (cur_log_entry == 0) reason = "Good going!";
-                    Toast.makeText(MainActivity.this, reason, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, reason, Toast.LENGTH_LONG).show();
                 }
-
-
             }
         });
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -193,12 +200,17 @@ public class MainActivity extends AppCompatActivity {
         client.disconnect();
     }
 
+    public void onButtonNextMotivationClick(View view){
+        loadNewMotivation();
+    }
+
     public void resetAll(){
         SharedPreferences log = getSharedPreferences(PREFS_LOG, 0);
         SharedPreferences.Editor editor = log.edit();
         editor.clear();
         editor.commit();
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -222,5 +234,72 @@ public class MainActivity extends AppCompatActivity {
                 recreate();
             }
         }
+    }
+
+    public void loadNewMotivation(){
+        //Start network thread here
+        new GetMotivation().execute
+                ("http://api.forismatic.com/api/1.0/?method=getQuote&lang=en&format=text&key=1");
+    }
+
+    public class GetMotivation extends AsyncTask<String , Void ,String> {
+        String server_response;
+
+        @Override
+        protected String doInBackground(String... strings) {
+
+            URL url;
+            HttpURLConnection urlConnection = null;
+
+            try {
+                url = new URL(strings[0]);
+                urlConnection = (HttpURLConnection) url.openConnection();
+
+                int responseCode = urlConnection.getResponseCode();
+
+                if(responseCode == HttpURLConnection.HTTP_OK){
+                    server_response = readStream(urlConnection.getInputStream());
+                    return server_response;
+                }
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            textViewMotivation.setText(s.replace("(","\n- ").replace(")",""));
+        }
+    }
+
+// Converting InputStream to String
+
+    private String readStream(InputStream in) {
+        BufferedReader reader = null;
+        StringBuffer response = new StringBuffer();
+        try {
+            reader = new BufferedReader(new InputStreamReader(in));
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return response.toString();
     }
 }
