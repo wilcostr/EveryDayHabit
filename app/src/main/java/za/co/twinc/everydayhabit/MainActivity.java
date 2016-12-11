@@ -35,9 +35,11 @@ public class MainActivity extends AppCompatActivity {
     public static final String PREFS_LOG = "prefs_log";
     public static final int NUM_LOG_ENTRIES = 49;
     static final int EDIT_DAY_REQUEST = 1;
+    static final int NEW_HABIT_REQUEST = 2;
     int streak_longest, streak_current, days_fail, days_fail_legit, days_success;
 
     private AdView mAdView;
+    private TextView textViewHabit;
     private TextView textViewMotivation;
 
     /**
@@ -51,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Initialise stats
         TextView textViewSuccessRate = (TextView) findViewById(R.id.textViewSuccessRate);
         TextView textViewCurrentStreak = (TextView) findViewById(R.id.textViewCurrentStreak);
         TextView textViewLongestStreak = (TextView) findViewById(R.id.textViewLongestStreak);
@@ -91,10 +94,16 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
+        //Set stats
         textViewSuccessRate.setText(String.format("%.1f",
                 ((100.0*days_success)/(days_success+days_fail+days_fail_legit)))+"%");
         textViewCurrentStreak.setText(""+streak_current);
         textViewLongestStreak.setText(""+streak_longest);
+
+
+        //Initialise and set display of current habit
+        textViewHabit = (TextView) findViewById(R.id.textView_habit);
+        textViewHabit.setText(log.getString("habit","No habit set"));
 
         //Initialise gridContent with latest log_entries
         GridView gridContent = (GridView) findViewById(R.id.content_grid);
@@ -157,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.action_new_habit:
                 Intent newHabit = new Intent(getApplicationContext(), NewHabitActivity.class);
-                startActivity(newHabit);
+                startActivityForResult(newHabit, NEW_HABIT_REQUEST);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -214,12 +223,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Check which request we're responding to
-        if (requestCode == EDIT_DAY_REQUEST) {
-            // Make sure the request was successful
-            if (resultCode == RESULT_OK) {
-                //recreate();
-
+        // Make sure the request was successful
+        if (resultCode == RESULT_OK) {
+            // Check which request we're responding to
+            if (requestCode == EDIT_DAY_REQUEST) {
                 SharedPreferences log = getSharedPreferences(PREFS_LOG, 0);
                 SharedPreferences.Editor editor = log.edit();
 
@@ -233,13 +240,21 @@ public class MainActivity extends AppCompatActivity {
                 editor.commit();
                 recreate();
             }
+            else if (requestCode == NEW_HABIT_REQUEST) {
+                SharedPreferences log = getSharedPreferences(PREFS_LOG, 0);
+                SharedPreferences.Editor editor = log.edit();
+                String newHabit = data.getExtras().getString("habit");
+                editor.putString("habit", newHabit);
+                editor.commit();
+                textViewHabit.setText(newHabit);
+            }
         }
     }
 
     public void loadNewMotivation(){
         //Start network thread here
         new GetMotivation().execute
-                ("http://api.forismatic.com/api/1.0/?method=getQuote&lang=en&format=text&key=1");
+                ("http://api.forismatic.com/api/1.0/?method=getQuote&lang=en&format=text");
     }
 
     public class GetMotivation extends AsyncTask<String , Void ,String> {
