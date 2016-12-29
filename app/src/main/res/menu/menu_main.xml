@@ -11,9 +11,13 @@
         android:orderInCategory="101"
         android:title="@string/action_reset" />
     <item
-        android:title="@string/action_new_habit"
+        android:id="@+id/action_new_habit"
         android:orderInCategory="102"
-        android:id="@+id/action_new_habit" />
+        android:title="@string/action_new_habit"/>
+    <item
+        android:id="@+id/test"
+        android:orderInCategory="103"
+        android:title="test"/>
 
 
 </menu>

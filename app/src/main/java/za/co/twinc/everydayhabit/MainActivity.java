@@ -91,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
                 streak_current = 0;
             }
             if (streak_current > streak_longest) streak_longest = streak_current;
-
         }
 
         //Set stats
@@ -167,6 +166,10 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_new_habit:
                 Intent newHabit = new Intent(getApplicationContext(), NewHabitActivity.class);
                 startActivityForResult(newHabit, NEW_HABIT_REQUEST);
+                return true;
+            case R.id.test:
+                Intent testSwipe = new Intent(getApplicationContext(), SwipeActivity.class);
+                startActivity(testSwipe);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -317,4 +320,7 @@ public class MainActivity extends AppCompatActivity {
         }
         return response.toString();
     }
+
+
+
 }

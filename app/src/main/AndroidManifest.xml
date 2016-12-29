@@ -41,7 +41,13 @@
         <activity
             android:name=".NewHabitActivity"
             android:label="@string/title_activity_new_habit"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:name=".SwipeActivity"
+            android:label="test"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
     </application>
 
 </manifest>
