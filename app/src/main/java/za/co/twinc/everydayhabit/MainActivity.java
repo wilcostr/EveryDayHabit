@@ -1,19 +1,28 @@
 package za.co.twinc.everydayhabit;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewFlipper;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -32,15 +41,22 @@ import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String PREFS_LOG = "prefs_log";
+    public static Context context;
+    public static final String MAIN_PREFS = "main_app_prefs";
+    public static final String HABIT_PREFS = "habit_prefs_";
     public static final int NUM_LOG_ENTRIES = 49;
     static final int EDIT_DAY_REQUEST = 1;
     static final int NEW_HABIT_REQUEST = 2;
     int streak_longest, streak_current, days_fail, days_fail_legit, days_success;
+    int current_habit;
 
     private AdView mAdView;
-    private TextView textViewHabit;
+    private GridView gridContent;
+    private TextView textViewSuccessRate, textViewCurrentStreak, textViewLongestStreak;
     private TextView textViewMotivation;
+
+    SwipeAdapter swipeAdapter;
+    ViewPager viewPager;
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -53,10 +69,32 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        context = this;
+
+        // ViewPager and its adapters use support library
+        // fragments, so use getSupportFragmentManager.
+        swipeAdapter = new SwipeAdapter(getSupportFragmentManager());
+        viewPager = (ViewPager) findViewById(R.id.pager);
+        viewPager.setAdapter(swipeAdapter);
+        //TODO: Fix viewPager height
+
         //Initialise stats
-        TextView textViewSuccessRate = (TextView) findViewById(R.id.textViewSuccessRate);
-        TextView textViewCurrentStreak = (TextView) findViewById(R.id.textViewCurrentStreak);
-        TextView textViewLongestStreak = (TextView) findViewById(R.id.textViewLongestStreak);
+        textViewSuccessRate = (TextView) findViewById(R.id.textViewSuccessRate);
+        textViewCurrentStreak = (TextView) findViewById(R.id.textViewCurrentStreak);
+        textViewLongestStreak = (TextView) findViewById(R.id.textViewLongestStreak);
+
+        viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected (int position) {
+                SharedPreferences main_log = context.getSharedPreferences(MAIN_PREFS, 0);
+                SharedPreferences.Editor editor = main_log.edit();
+                editor.putInt("habit_to_display", position);
+                editor.commit();
+                current_habit = position;
+                displayHabitContent();
+                //textViewLongestStreak.setText(""+position);
+            }
+        });
 
         //MobileAds.initialize(getApplicationContext(),"ca-app-pub-5782047288878600~9640464773");
         mAdView = (AdView) findViewById(R.id.adView);
@@ -69,50 +107,23 @@ public class MainActivity extends AppCompatActivity {
         textViewMotivation = (TextView) findViewById(R.id.textView_motivation);
         loadNewMotivation();
 
+        //TODO: Ticks should be set at one central place
         //Set ticks for success, fail, fail_legit
         final int[] TICKS = {R.drawable.tick_green, R.drawable.tick_red, R.drawable.tick_orange_2};
-        int[] log_entries = new int[NUM_LOG_ENTRIES];
-
-        //Get log_entries from PREFS_LOG and calculate stats
-        SharedPreferences log = getSharedPreferences(PREFS_LOG, 0);
-        for (int i = 0; i < NUM_LOG_ENTRIES; i++) {
-            log_entries[i] = log.getInt("log_entry_" + i, -1);
-
-            if (log_entries[i] == 0) {          //successful day
-                days_success ++;
-                streak_current ++;
-            }
-            else if (log_entries[i] == 1){      //Failure with no legit reason
-                days_fail ++;
-                streak_current = 0;
-            }
-            else if (log_entries[i] == 2){      //Failure with legit reason
-                days_fail_legit ++;
-                streak_current = 0;
-            }
-            if (streak_current > streak_longest) streak_longest = streak_current;
-        }
-
-        //Set stats
-        textViewSuccessRate.setText(String.format("%.1f",
-                ((100.0*days_success)/(days_success+days_fail+days_fail_legit)))+"%");
-        textViewCurrentStreak.setText(""+streak_current);
-        textViewLongestStreak.setText(""+streak_longest);
 
 
-        //Initialise and set display of current habit
-        textViewHabit = (TextView) findViewById(R.id.textView_habit);
-        textViewHabit.setText(log.getString("habit","No habit set"));
+        //Get log_entries from HABIT_PREFS and calculate stats
+        SharedPreferences main_log = getSharedPreferences(MAIN_PREFS, 0);
+        current_habit = main_log.getInt("habit_to_display",0);
 
-        //Initialise gridContent with latest log_entries
-        GridView gridContent = (GridView) findViewById(R.id.content_grid);
-        gridContent.setAdapter(new ImageAdapter(this, log_entries));
+        gridContent = (GridView) findViewById(R.id.content_grid);
+        displayHabitContent();
+
 
         gridContent.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                SharedPreferences log = getSharedPreferences(PREFS_LOG, 0);
-                SharedPreferences.Editor editor = log.edit();
+                SharedPreferences log = getSharedPreferences(HABIT_PREFS+current_habit, 0);
 
                 int prev_log_entry = log.getInt("log_entry_" + (position - 1), -1);
                 int next_log_entry = log.getInt("log_entry_" + (position + 1), -1);
@@ -139,6 +150,43 @@ public class MainActivity extends AppCompatActivity {
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+    }
+
+    public void displayHabitContent(){
+        int[] log_entries = new int[NUM_LOG_ENTRIES];
+        SharedPreferences habit_log = getSharedPreferences(HABIT_PREFS+current_habit, 0);
+
+        streak_current = 0; streak_longest = 0;
+        days_success = 0; days_fail = 0; days_fail_legit = 0;
+        for (int i = 0; i < NUM_LOG_ENTRIES; i++) {
+            log_entries[i] = habit_log.getInt("log_entry_" + i, -1);
+
+            if (log_entries[i] == 0) {          //successful day
+                days_success ++;
+                streak_current ++;
+            }
+            else if (log_entries[i] == 1){      //Failure with no legit reason
+                days_fail ++;
+                streak_current = 0;
+            }
+            else if (log_entries[i] == 2){      //Failure with legit reason
+                days_fail_legit ++;
+                streak_current = 0;
+            }
+            if (streak_current > streak_longest) streak_longest = streak_current;
+        }
+
+        //Set stats
+        int total_days = days_success+days_fail+days_fail_legit;
+        if (total_days == 0) textViewSuccessRate.setText("0%");
+        else {
+            textViewSuccessRate.setText(String.format("%.1f",((100.0*days_success)/total_days))+"%");
+        }
+        textViewCurrentStreak.setText(""+streak_current);
+        textViewLongestStreak.setText(""+streak_longest);
+
+        //Initialise gridContent with latest log_entries
+        gridContent.setAdapter(new ImageAdapter(context, log_entries));
     }
 
 
@@ -168,8 +216,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(newHabit, NEW_HABIT_REQUEST);
                 return true;
             case R.id.test:
-                Intent testSwipe = new Intent(getApplicationContext(), SwipeActivity.class);
-                startActivity(testSwipe);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -217,7 +263,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void resetAll(){
-        SharedPreferences log = getSharedPreferences(PREFS_LOG, 0);
+        //TODO: Reset all shared preferences
+        SharedPreferences log = getSharedPreferences(MAIN_PREFS, 0);
         SharedPreferences.Editor editor = log.edit();
         editor.clear();
         editor.commit();
@@ -230,27 +277,38 @@ public class MainActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             // Check which request we're responding to
             if (requestCode == EDIT_DAY_REQUEST) {
-                SharedPreferences log = getSharedPreferences(PREFS_LOG, 0);
-                SharedPreferences.Editor editor = log.edit();
-
+                SharedPreferences habit_log = getSharedPreferences(HABIT_PREFS+current_habit, 0);
+                SharedPreferences.Editor habit_editor = habit_log.edit();
                 int log_position = data.getExtras().getInt("clicked_position");
                 int log_entry = data.getExtras().getInt("state");
-                editor.putInt("log_entry_" + log_position, log_entry);
+                habit_editor.putInt("log_entry_" + log_position, log_entry);
 
                 String reason = data.getExtras().getString("reason");
-                if (reason != null) editor.putString("log_reason_" + log_position, reason);
-
-                editor.commit();
-                recreate();
+                if (reason != null) habit_editor.putString("log_reason_" + log_position, reason);
+                habit_editor.commit();
+                displayHabitContent();
             }
             else if (requestCode == NEW_HABIT_REQUEST) {
-                SharedPreferences log = getSharedPreferences(PREFS_LOG, 0);
-                SharedPreferences.Editor editor = log.edit();
+                SharedPreferences main_log = getSharedPreferences(MAIN_PREFS, 0);
+                SharedPreferences.Editor main_editor = main_log.edit();
+
                 String newHabit = data.getExtras().getString("habit");
-                editor.putString("habit", newHabit);
-                editor.commit();
-                textViewHabit.setText(newHabit);
+                int new_num_habits = main_log.getInt("num_habits",0) + 1;
+                int next_habit = main_log.getInt("next_habit",0);
+
+                //Create shared preference main_log for new habit
+                SharedPreferences habit_log = getSharedPreferences(HABIT_PREFS+next_habit, 0);
+                SharedPreferences.Editor habit_editor = habit_log.edit();
+                habit_editor.putString("habit", newHabit);
+                habit_editor.commit();
+
+                main_editor.putInt("num_habits", new_num_habits);
+                main_editor.putInt("next_habit", next_habit+1);
+                main_editor.commit();
+                swipeAdapter.notifyDataSetChanged();
+                viewPager.setCurrentItem(new_num_habits-1);
             }
+
         }
     }
 
@@ -321,6 +379,42 @@ public class MainActivity extends AppCompatActivity {
         return response.toString();
     }
 
+    public class SwipeAdapter extends FragmentStatePagerAdapter {
+        public SwipeAdapter(FragmentManager fm) {
+            super(fm);
+        }
 
+        @Override
+        public Fragment getItem(int position) {
+            Fragment fragment = new PageFragment();
+            Bundle bundle = new Bundle();
+            bundle.putInt("num",position);
+            fragment.setArguments(bundle);
+            return fragment;
+        }
+
+        @Override
+        public int getCount() {
+            SharedPreferences log = getSharedPreferences(MAIN_PREFS, 0);
+            return log.getInt("num_habits", 1);
+        }
+    }
+
+    public static class PageFragment extends Fragment {
+        TextView textViewTemp;
+        @Override
+        public View onCreateView(LayoutInflater inflater,
+                                 ViewGroup container, Bundle savedInstanceState) {
+            View view = inflater.inflate(R.layout.content_page_fragment, container, false);
+            Bundle bundle = getArguments();
+
+            //Load Shared Preferences of habit
+            SharedPreferences habit_log = context.getSharedPreferences(HABIT_PREFS+bundle.getInt("num"), 0);
+
+            textViewTemp = (TextView) view.findViewById(R.id.textView_swipe);
+            textViewTemp.setText(habit_log.getString("habit","No Habit Set"));
+            return view;
+        }
+    }
 
 }

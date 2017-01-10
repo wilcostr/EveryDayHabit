@@ -63,18 +63,6 @@ public class ImageAdapter extends BaseAdapter {
             textV = (TextView) convertView;
         }
 
-//        SharedPreferences log = getA getSharedPreferences("prefs_log", 0);
-//        int log_entry_state = log.getInt("log_entry"+position, -1);
-//        if (log_entry_state >= 0){
-//            textV.setBackgroundResource(mThumbIds[position]);
-//        }
-
-
-        //textV.setBackgroundResource(mThumbIds[position]);
-
-
-
-
         return textV;
     }
 }

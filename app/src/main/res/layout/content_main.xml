@@ -20,23 +20,17 @@
     </com.google.android.gms.ads.AdView>
 
 
-
-
-    <TextView
-        android:id="@+id/textView_habit"
-        android:text="Get Eight Hours of Sleep"
-        style="@style/B18TextViewStyle"
+    <android.support.v4.view.ViewPager
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/pager"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/adView"
-        android:textAlignment="center"
-        android:padding="16dp"
-        android:background="@color/colorPrimaryLight"/>
+        android:layout_height="55dp"
+        android:layout_below="@id/adView"/>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/textView_habit">
+        android:layout_below="@id/pager">
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/content_main"
