@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
@@ -19,7 +20,7 @@ import android.widget.TextView;
 public class EditDayActivity extends AppCompatActivity {
 
     Intent requestIntent;
-
+    TextView textViewHabit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,10 +28,15 @@ public class EditDayActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_day);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) actionBar.setDisplayHomeAsUpEnabled(true);
 
         // Get intent data
         requestIntent = getIntent();
+        textViewHabit = (TextView)findViewById(R.id.text_view_habit);
+        //TODO: Use strings resource here
+        textViewHabit.setText("Did you " +
+                requestIntent.getStringExtra("habit").toLowerCase() + " today?");
 
         //These start off invisible
         final TextView textView2 = (TextView) findViewById(R.id.textView2);
@@ -75,7 +81,6 @@ public class EditDayActivity extends AppCompatActivity {
             }
         });
 
-
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
@@ -89,11 +94,9 @@ public class EditDayActivity extends AppCompatActivity {
         });
     }
 
-
     public void processClick(int state) {
         requestIntent.putExtra("state", state);
         setResult(Activity.RESULT_OK, requestIntent);
         finish();
     }
-
 }

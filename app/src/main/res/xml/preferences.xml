@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/preference_category_general"
+        android:key="preference_category_general">
+        <Preference android:layout="@layout/preferences_divider"/>
+        <SwitchPreference
+            android:defaultValue="true"
+            android:title="@string/preference_notifications"
+            android:key="switch_preference_notification" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:title="Accept Legitimate Excuses"
+            android:key="switch_preference_legit"
+            android:summaryOn="Legitimate excuses will not break streaks"
+            android:summaryOff="Legitimate excuses are considered missed days and will break streaks"/>
+        <Preference
+            android:key="simple_text_about"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="About"
+            android:summary="EveryDayHabit Version 0.0.0"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/preference_category_specific"
+        android:key="preference_category_specific">
+        <Preference android:layout="@layout/preferences_divider"/>
+        <EditTextPreference
+            android:defaultValue="@string/default_habit_text"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Description"
+            android:key="edit_text_preference_habit_text"
+            android:summary="@string/default_habit_text" />
+
+        <EditTextPreference
+            android:defaultValue="@string/default_habit_word"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Summary"
+            android:key="edit_text_preference_habit_summary"
+            android:summary="@string/default_habit_word" />
+
+        <Preference
+            android:key="time_picker_preference_notification"
+            android:summary="Summary"
+            android:title="Notification Time" />
+
+        <Preference
+            android:key="simple_text_habit_date"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Habit Start Date"
+            android:summary="NaN"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

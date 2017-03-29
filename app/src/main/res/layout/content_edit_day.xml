@@ -14,10 +14,10 @@
     tools:showIn="@layout/activity_edit_day">
 
     <TextView
-        android:text="Did you get eight hours of sleep today?"
+        android:text="@string/edit_day_default"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/textView1"
+        android:id="@+id/text_view_habit"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentRight="true"
@@ -34,7 +34,7 @@
         android:id="@+id/radio_edit_day"
         android:layout_marginTop="17dp"
         android:padding="10dp"
-        android:layout_below="@+id/textView1"
+        android:layout_below="@id/text_view_habit"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true">
 
@@ -63,7 +63,7 @@
         style="@style/B18TextViewStyle"
         android:visibility="gone"
         android:layout_marginTop="27dp"
-        android:layout_below="@+id/radio_edit_day"/>
+        android:layout_below="@id/radio_edit_day"/>
 
     <EditText
         android:layout_width="match_parent"
@@ -71,7 +71,7 @@
         android:inputType="textCapSentences"
         android:maxLength="2000"
         android:ems="10"
-        android:layout_below="@+id/textView2"
+        android:layout_below="@id/textView2"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="26dp"
         android:id="@+id/editText"
@@ -88,11 +88,12 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="34dp"
         android:id="@+id/checkBox"
-        android:layout_below="@+id/editText"
+        android:layout_below="@id/editText"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:textSize="16sp"
         android:textAlignment="textStart"
+        android:gravity="start"
         android:visibility="gone"/>
 
     <Button
@@ -102,6 +103,6 @@
         android:layout_marginTop="28dp"
         android:id="@+id/button_done"
         android:visibility="visible"
-        android:layout_below="@+id/checkBox" />
+        android:layout_below="@id/checkBox" />
 
 </RelativeLayout>
