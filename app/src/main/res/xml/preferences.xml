@@ -10,10 +10,10 @@
             android:key="switch_preference_notification" />
         <SwitchPreference
             android:defaultValue="false"
-            android:title="Accept Legitimate Excuses"
+            android:title="@string/preference_accept_excuses"
             android:key="switch_preference_legit"
-            android:summaryOn="Legitimate excuses will not break streaks"
-            android:summaryOff="Legitimate excuses are considered missed days and will break streaks"/>
+            android:summaryOn="@string/preference_excuses_summary_on"
+            android:summaryOff="@string/preference_excuses_summary_off"/>
         <Preference
             android:key="simple_text_about"
             android:selectAllOnFocus="true"

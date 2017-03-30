@@ -78,7 +78,15 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences main_log = getSharedPreferences(MAIN_PREFS, 0);
 
-        current_habit = getIntent().getIntExtra("habit",-1);
+        // Try to get intent that opened main (only the case when opened from notification
+        Intent startMainIntent = getIntent();
+        current_habit = -1;
+        int currentDay = 20;
+
+        if (startMainIntent != null) {
+            current_habit = startMainIntent.getIntExtra("habit", -1);
+            currentDay = startMainIntent.getIntExtra("day", 20);
+        }
 
         if (current_habit != -1){
             //Main activity started with intent
@@ -87,8 +95,7 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
             // Send intent to EditDayActivity
             Intent editDay = new Intent(getApplicationContext(), EditDayActivity.class);
-            //TODO: Add editDay logic here
-            editDay.putExtra("clicked_position", 13);
+            editDay.putExtra("clicked_position", currentDay);
             editDay.putExtra("habit", getStringFromPrefs(HABIT_PREFS+current_habit,
                     "habit",getString(R.string.edit_day_default)));
 
@@ -453,7 +460,7 @@ public class MainActivity extends AppCompatActivity {
                 habit_editor.putInt("notify", data.getIntExtra("habit_time",0));
                 habit_editor.apply();
 
-                setAllNotificatoins();
+                //TODO update habit notification if anything changed.
 
                 swipeAdapter.notifyDataSetChanged();
                 recreate();
@@ -518,15 +525,6 @@ public class MainActivity extends AppCompatActivity {
     public static void setHabitNotification(Context ctx, int habitNum){
         String habitText = getStringFromPrefs(ctx, HABIT_PREFS+habitNum,"habit","perform your habit");
         int habitTime = getIntFromPrefs(ctx, HABIT_PREFS+habitNum,"notify",18*60);
-
-        long timeStart = getLongFromPrefs(ctx, HABIT_PREFS+habitNum,"date", 1490000000000L);
-        long timeDiff = System.currentTimeMillis() - timeStart;
-        long numDays =  TimeUnit.DAYS.convert(timeDiff,TimeUnit.MILLISECONDS);
-
-        if (timeDiff < 0 || getIntFromPrefs(ctx,HABIT_PREFS+habitNum,"log_entry_"+numDays, -1) != -1) {
-            // Only starting habit tomorrow OR already reported progress today
-            habitTime += 24*60; // Next notification only tomorrow
-        }
 
         AlarmReceiver alarmReceiver = new AlarmReceiver();
         alarmReceiver.setAlarm(ctx, habitText, habitNum, habitTime);

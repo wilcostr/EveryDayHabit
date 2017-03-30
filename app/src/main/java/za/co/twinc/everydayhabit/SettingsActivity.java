@@ -16,7 +16,6 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TimePicker;
 
-import java.util.Calendar;
 import java.util.Locale;
 import java.lang.String;
 
@@ -26,7 +25,8 @@ public class SettingsActivity extends Activity {
 
     public static final String KEY_PREF_HABIT_DESCRIPTION = "edit_text_preference_habit_text";
     public static final String KEY_PREF_HABIT_SUMMARY = "edit_text_preference_habit_summary";
-    public static final String KEY_PREF_NOTIFICATION = "time_picker_preference_notification";
+    public static final String KEY_PREF_NOTIFICATION_TIME = "time_picker_preference_notification";
+    public static final String KEY_PREF_NOTIFICATION_SWITCH = "switch_preference_notification";
 
     public static final String KEY_PREF_DATE = "simple_text_habit_date";
 
@@ -85,6 +85,10 @@ public class SettingsActivity extends Activity {
                                 intent.putExtra("habit_text",prefs.getString(key,""));
                             else intent.putExtra("habit_summary",prefs.getString(key,""));
                         }
+                        else if (key.equals(KEY_PREF_NOTIFICATION_SWITCH)){
+                            MainActivity.setAllNotifications(getActivity());
+
+                        }
                     }
                 };
 
@@ -121,7 +125,7 @@ public class SettingsActivity extends Activity {
             int minute = intent.getIntExtra("habit_time",0)%60;
             // Add TimePickerDialog
             final TimePickerDialog.OnTimeSetListener timeSetListener = this;
-            timePref = findPreference(KEY_PREF_NOTIFICATION);
+            timePref = findPreference(KEY_PREF_NOTIFICATION_TIME);
             timePref.setSummary(String.format(Locale.UK, "%02d",hour)  + ":" +
                                 String.format(Locale.UK, "%02d",minute));
             timePref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {

@@ -12,8 +12,10 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
+import static android.support.v4.app.NotificationCompat.CATEGORY_REMINDER;
 
 /**
  * Created by wilco on 2017/02/02.
@@ -32,10 +34,21 @@ public class AlarmReceiver extends BroadcastReceiver
     {
         int habitNum = intent.getIntExtra("habit_number",-1);
 
+        long timeStart = MainActivity.getLongFromPrefs(context, MainActivity.HABIT_PREFS+habitNum,
+                "date", 1490000000000L);
+        long timeDiff = System.currentTimeMillis() - timeStart;
+        long numDays =  TimeUnit.DAYS.convert(timeDiff,TimeUnit.MILLISECONDS);
+
+        if (timeDiff < 0 || MainActivity.getIntFromPrefs(context,MainActivity.HABIT_PREFS+habitNum,
+                "log_entry_"+numDays, -1) != -1) {
+            // Only starting habit tomorrow OR already reported progress today
+            return;
+        }
+
         // Create intent to open Main, load habit number in extras
         Intent openMainIntent = new Intent(context, MainActivity.class);
         openMainIntent.putExtra("habit", habitNum);
-        //TODO:Handle this default
+        openMainIntent.putExtra("day", (int)numDays);
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
         // Adds the back stack for the Intent (but not the Intent itself)
@@ -52,13 +65,12 @@ public class AlarmReceiver extends BroadcastReceiver
                 .setContentTitle("Did you " + intent.getStringExtra("habit_text").toLowerCase() + " today?")
                 //.setContentText("Hello World!")
                 .setContentIntent(openMainPendingIntent)
-                .setAutoCancel(true);
+                .setAutoCancel(true)
+                .setCategory(CATEGORY_REMINDER);
 
-        // Sets an ID for the notification
-        int mNotificationId = habitNum;
         NotificationManager mNotifyMgr = (NotificationManager)context.getSystemService(NOTIFICATION_SERVICE);
         // Builds the notification and issues it.
-        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+        mNotifyMgr.notify(habitNum, mBuilder.build());
     }
 
     public void setAlarm(Context context, String habitText, int habitNum, int habitTime) {

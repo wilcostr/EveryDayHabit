@@ -20,7 +20,7 @@
         complete. Now think of something in your daily routine that can act as a trigger for
         performing your new habit and complete the following:\n
     </string>
-    <string name="new_habit_2">Every day, I am going to...\n</string>
+    <string name="new_habit_2">Every day, I am going to…\n</string>
     <string name="new_habit_notify_title">Notification Time</string>
     <string name="new_habit_notify">Set a daily reminder to log your progress.
         (Don\'t rely on this as a trigger to perform your habit)\n</string>
@@ -33,9 +33,13 @@
     <string name="delete_habit">Delete Habit</string>
     <string name="preference_category_general">General Settings</string>
     <string name="preference_notifications">Notifications</string>
-    <string name="preference_category_specific">Habit settings</string>
+    <string name="preference_category_specific">Habit Settings</string>
+    <string name="preference_accept_excuses">Accept Legitimate Excuses</string>
+
     <string name="default_habit_text">Default Habit Text</string>
     <string name="default_habit_word">Habit</string>
+    <string name="preference_excuses_summary_on">Legitimate excuses will not break streaks</string>
+    <string name="preference_excuses_summary_off">Legitimate excuses are considered missed days and will break streaks</string>
 
 
 </resources>
