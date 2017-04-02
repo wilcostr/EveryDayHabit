@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.SwitchPreference;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
@@ -86,8 +87,9 @@ public class SettingsActivity extends Activity {
                             else intent.putExtra("habit_summary",prefs.getString(key,""));
                         }
                         else if (key.equals(KEY_PREF_NOTIFICATION_SWITCH)){
-                            MainActivity.setAllNotifications(getActivity());
-
+                            Preference pref = findPreference(key);
+                            if (((SwitchPreference)pref).isChecked())
+                                MainActivity.setAllNotifications(getActivity());
                         }
                     }
                 };

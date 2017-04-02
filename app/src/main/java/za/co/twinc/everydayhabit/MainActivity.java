@@ -16,11 +16,9 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.TextView;
@@ -45,7 +43,6 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static Context context;
     public static final String MAIN_PREFS = "main_app_prefs";
     public static final String HABIT_PREFS = "habit_prefs_";
     public static final int NUM_LOG_ENTRIES = 49;
@@ -73,8 +70,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        context = this;
 
         SharedPreferences main_log = getSharedPreferences(MAIN_PREFS, 0);
 
@@ -146,9 +141,6 @@ public class MainActivity extends AppCompatActivity {
         textViewMotivation = (TextView) findViewById(R.id.textView_motivation);
         loadNewMotivation();
 
-        //TODO: Ticks should be set at one central place
-        //Set ticks for success, fail, fail_legit
-        //final int[] TICKS = {R.drawable.tick_green, R.drawable.tick_red, R.drawable.tick_orange_2};
 
         gridContent = (GridView) findViewById(R.id.content_grid);
         displayHabitContent();
@@ -168,7 +160,13 @@ public class MainActivity extends AppCompatActivity {
                             "habit",getString(R.string.edit_day_default)));
 
                     startActivityForResult(editDay, EDIT_DAY_REQUEST);
-                } else if (position < numDays) {
+                }
+                else if (position == numDays+1) {
+                    // Clicked on tomorrow
+                    Toast.makeText(MainActivity.this, "Cannot edit tomorrow's entry", Toast.LENGTH_LONG).show();
+                }
+                else if (position < numDays) {
+                    // Clicked on an old entry
                     String reason = getStringFromPrefs(HABIT_PREFS+current_habit,
                             "log_reason_" + position,
                             "You were so lazy, you didn't even give a reason!");
@@ -200,7 +198,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static int getIntFromPrefs(Context ctx, String pref, String key, int default_return){
-        //TODO: Use this everywhere!
         SharedPreferences log = ctx.getSharedPreferences(pref, 0);
         return log.getInt(key, default_return);
     }
@@ -542,8 +539,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Overload method for non-static calls
-    public void setAllNotificatoins(){ setAllNotifications(this);}
+//    // Overload method for non-static calls
+//    public void setAllNotificatoins(){ setAllNotifications(this);}
 
     public void loadNewMotivation(){
         //Start network thread here
@@ -637,29 +634,4 @@ public class MainActivity extends AppCompatActivity {
             return getStringFromPrefs(HABIT_PREFS+habitNum, "habit_summary", "Habit");
         }
     }
-
-
-
-    // Class containing Fragments for swiping through
-    public static class PageFragment extends Fragment {
-        // TextView in a Fragment to display full habit text
-        TextView textViewHabit;
-        @Override
-        public View onCreateView(LayoutInflater inflater,
-                                 ViewGroup container, Bundle savedInstanceState) {
-            View view = inflater.inflate(R.layout.content_page_fragment, container, false);
-            Bundle bundle = getArguments();
-            textViewHabit = (TextView) view.findViewById(R.id.textView_swipe);
-
-            // TODO: Remove use of context here (maybe move PageFragment to own class?
-            // Load Shared Preferences of habit
-            int habitNum = loadHabitMap(context)[bundle.getInt("num")];
-            SharedPreferences habit_log = context.getSharedPreferences(HABIT_PREFS+habitNum, 0);
-            String habitText = habit_log.getString("habit","No Habit Set");
-
-            textViewHabit.setText(habitText);
-            return view;
-        }
-    }
-
 }
