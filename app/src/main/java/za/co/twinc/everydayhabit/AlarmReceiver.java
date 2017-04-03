@@ -34,6 +34,7 @@ public class AlarmReceiver extends BroadcastReceiver
     {
         int habitNum = intent.getIntExtra("habit_number",-1);
 
+        // TODO: Test MainActivity reliability against GC
         long timeStart = MainActivity.getLongFromPrefs(context, MainActivity.HABIT_PREFS+habitNum,
                 "date", 1490000000000L);
         long timeDiff = System.currentTimeMillis() - timeStart;
@@ -86,8 +87,8 @@ public class AlarmReceiver extends BroadcastReceiver
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, habitTime/60);
-        calendar.set(Calendar.MINUTE, habitTime%60);
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
 
         alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP,
                 calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmIntent);

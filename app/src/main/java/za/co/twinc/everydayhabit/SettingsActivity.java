@@ -24,10 +24,11 @@ import java.lang.String;
 public class SettingsActivity extends Activity {
     public static Intent intent;
 
-    public static final String KEY_PREF_HABIT_DESCRIPTION = "edit_text_preference_habit_text";
-    public static final String KEY_PREF_HABIT_SUMMARY = "edit_text_preference_habit_summary";
-    public static final String KEY_PREF_NOTIFICATION_TIME = "time_picker_preference_notification";
-    public static final String KEY_PREF_NOTIFICATION_SWITCH = "switch_preference_notification";
+    public static final String KEY_PREF_HABIT_DESCRIPTION =     "edit_text_preference_habit_text";
+    public static final String KEY_PREF_HABIT_SUMMARY =         "edit_text_preference_habit_summary";
+    public static final String KEY_PREF_NOTIFICATION_TIME =     "time_picker_preference_notification";
+    public static final String KEY_PREF_NOTIFICATION_SWITCH =   "switch_preference_notification";
+    public static final String KEY_PREF_LEGIT_SWITCH =          "switch_preference_legit";
 
     public static final String KEY_PREF_DATE = "simple_text_habit_date";
 

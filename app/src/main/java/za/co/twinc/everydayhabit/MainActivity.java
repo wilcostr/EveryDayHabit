@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -76,11 +77,11 @@ public class MainActivity extends AppCompatActivity {
         // Try to get intent that opened main (only the case when opened from notification
         Intent startMainIntent = getIntent();
         current_habit = -1;
-        int currentDay = 20;
+        int currentDay = -1;
 
         if (startMainIntent != null) {
             current_habit = startMainIntent.getIntExtra("habit", -1);
-            currentDay = startMainIntent.getIntExtra("day", 20);
+            currentDay = startMainIntent.getIntExtra("day", -1);
         }
 
         if (current_habit != -1){
@@ -222,6 +223,12 @@ public class MainActivity extends AppCompatActivity {
         int[] log_entries = new int[NUM_LOG_ENTRIES];
         SharedPreferences habit_log = getSharedPreferences(HABIT_PREFS+current_habit, 0);
 
+        // Include/Exclude legit excuses based on settings
+        SharedPreferences settingsPref = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean includeLegit = settingsPref.getBoolean(SettingsActivity.KEY_PREF_LEGIT_SWITCH, false);
+
+
+
         long timeDiff = System.currentTimeMillis() - habit_log.getLong("date", 1490000000000L);
         long numDays =  TimeUnit.DAYS.convert(timeDiff,TimeUnit.MILLISECONDS);
 
@@ -242,8 +249,14 @@ public class MainActivity extends AppCompatActivity {
                 streak_current = 0;
             }
             else if (log_entries[i] == 2){      // Failure with legit reason
-                days_fail_legit ++;
-                streak_current = 0;
+                if (includeLegit){
+                    days_success ++;
+                    streak_current ++;
+                }
+                else{
+                    days_fail_legit ++;
+                    streak_current = 0;
+                }
             }
             if (streak_current > streak_longest) streak_longest = streak_current;
         }
@@ -251,7 +264,6 @@ public class MainActivity extends AppCompatActivity {
         //Set stats
         int total_days = days_success+days_fail+days_fail_legit;
 
-        // TODO: Include/Exclude legit based on settings
         if (total_days == 0) textViewSuccessRate.setText("0%");
         else textViewSuccessRate.setText(String.format(Locale.UK,"%.1f%%",((100.0*days_success)/total_days)));
         textViewCurrentStreak.setText(String.format(Locale.UK,"%d",streak_current));
