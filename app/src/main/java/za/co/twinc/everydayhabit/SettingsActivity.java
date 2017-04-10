@@ -91,6 +91,8 @@ public class SettingsActivity extends Activity {
                             Preference pref = findPreference(key);
                             if (((SwitchPreference)pref).isChecked())
                                 MainActivity.setAllNotifications(getActivity());
+                            else
+                                MainActivity.cancelAllNotifications(getActivity());
                         }
                     }
                 };

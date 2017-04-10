@@ -1,11 +1,26 @@
 package za.co.twinc.everydayhabit;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.concurrent.TimeUnit;
+
+import static za.co.twinc.everydayhabit.MainActivity.EDIT_DAY_REQUEST;
+import static za.co.twinc.everydayhabit.MainActivity.HABIT_PREFS;
+import static za.co.twinc.everydayhabit.MainActivity.NUM_LOG_ENTRIES;
+import static za.co.twinc.everydayhabit.MainActivity.getIntFromPrefs;
+import static za.co.twinc.everydayhabit.MainActivity.getLongFromPrefs;
+import static za.co.twinc.everydayhabit.MainActivity.getStringFromPrefs;
+import static za.co.twinc.everydayhabit.MainActivity.loadHabitMap;
 
 /**
  * Created by wilco on 2017/04/02.
@@ -16,19 +31,78 @@ import android.widget.TextView;
 public class PageFragment extends Fragment {
     // TextView in a Fragment to display full habit text
     TextView textViewHabit;
+    private GridView gridContent;
+    private int habitNum;
+
     @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.content_page_fragment, container, false);
         Bundle bundle = getArguments();
+
         textViewHabit = (TextView) view.findViewById(R.id.textView_swipe);
 
         // Load Shared Preferences of habit
-        int habitNum = MainActivity.loadHabitMap(getContext())[bundle.getInt("num")];
-        String habitText = MainActivity.getStringFromPrefs(getContext(), MainActivity.HABIT_PREFS+habitNum,
+        habitNum = loadHabitMap(getContext())[bundle.getInt("num")];
+        String habitText = getStringFromPrefs(getContext(), HABIT_PREFS+habitNum,
                 "habit", "No Habit Set");
 
         textViewHabit.setText(habitText);
+
+        gridContent = (GridView) view.findViewById(R.id.content_grid);
+        displayHabitContent();
+
+        gridContent.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v,
+                                    int position, long id) {
+                long timeStart = getLongFromPrefs(getContext(),HABIT_PREFS+habitNum,"date", 1490000000000L);
+                long timeDiff = System.currentTimeMillis() - timeStart;
+                long numDays =  TimeUnit.DAYS.convert(timeDiff,TimeUnit.MILLISECONDS);
+
+                if (position == numDays) {
+                    // Send intent to EditDayActivity
+                    Intent editDay = new Intent(getContext(), EditDayActivity.class);
+                    editDay.putExtra("clicked_position", position);
+                    editDay.putExtra("habit",getStringFromPrefs(getContext(),HABIT_PREFS+habitNum,
+                            "habit",getString(R.string.edit_day_default)));
+
+                    getActivity().startActivityForResult(editDay, EDIT_DAY_REQUEST);
+                }
+                else if (position == numDays+1) {
+                    // Clicked on tomorrow
+                    Toast.makeText(getContext(), "Cannot edit tomorrow's entry", Toast.LENGTH_LONG).show();
+                }
+                else if (position < numDays) {
+                    // Clicked on an old entry
+                    String reason = getStringFromPrefs(getContext(),HABIT_PREFS+habitNum,
+                            "log_reason_" + position,
+                            "You were so lazy, you didn't even give a reason!");
+                    //TODO: Add multiple praise randomised
+                    if (getIntFromPrefs(getContext(), HABIT_PREFS+habitNum,"log_entry_"+position,-1) == 0)
+                        reason = "Well done, keep it up!";
+                    Toast.makeText(getContext(), reason, Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
         return view;
+    }
+
+    public void displayHabitContent(){
+        int[] log_entries = new int[NUM_LOG_ENTRIES];
+        SharedPreferences habit_log = getContext().getSharedPreferences(HABIT_PREFS+habitNum, 0);
+
+        long timeDiff = System.currentTimeMillis() - habit_log.getLong("date", 1490000000000L);
+        long numDays =  TimeUnit.DAYS.convert(timeDiff,TimeUnit.MILLISECONDS);
+
+        for (int i = 0; i < NUM_LOG_ENTRIES; i++) {
+            log_entries[i] = habit_log.getInt("log_entry_" + i, -1);
+            if (log_entries[i] == -1 && i < numDays)
+                log_entries[i] = 1;             // Assume failure with no report
+        }
+
+        //Initialise gridContent with latest log_entries
+        gridContent.setAdapter(new ImageAdapter(getContext(), log_entries));
     }
 }

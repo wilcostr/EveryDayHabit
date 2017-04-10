@@ -20,8 +20,6 @@ import android.text.format.DateFormat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,18 +45,19 @@ public class MainActivity extends AppCompatActivity {
     public static final String MAIN_PREFS = "main_app_prefs";
     public static final String HABIT_PREFS = "habit_prefs_";
     public static final int NUM_LOG_ENTRIES = 49;
-    static final int EDIT_DAY_REQUEST = 1;
+    public static final int EDIT_DAY_REQUEST = 1;
     static final int NEW_HABIT_REQUEST = 2;
     static final int SETTINGS_REQUEST = 3;
+
     int streak_longest, streak_current, days_fail, days_fail_legit, days_success;
     int current_habit;
 
-    private GridView gridContent;
     private TextView textViewSuccessRate, textViewCurrentStreak, textViewLongestStreak;
     private TextView textViewMotivation;
 
-    SwipeAdapter swipeAdapter;
-    ViewPager viewPager;
+    private SwipeAdapter swipeAdapter;
+    private ViewPager viewPager;
+    private static AlarmReceiver alarmReceiver;
 
 
     /**
@@ -101,6 +100,10 @@ public class MainActivity extends AppCompatActivity {
             current_habit = main_log.getInt("habit_to_display",0);
         }
 
+        // Set alarmReceiver for notifications
+        alarmReceiver = new AlarmReceiver();
+        setAllNotifications();
+
         // ViewPager and its adapters use support library
         // fragments, so use getSupportFragmentManager.
         swipeAdapter = new SwipeAdapter(getSupportFragmentManager());
@@ -123,13 +126,14 @@ public class MainActivity extends AppCompatActivity {
             public void onPageSelected (int position) {
                 SharedPreferences main_log = getSharedPreferences(MAIN_PREFS, 0);
                 SharedPreferences.Editor editor = main_log.edit();
-                int habit_num = loadHabitMap()[position];
+                int habit_num = habitIndex(position);
                 editor.putInt("habit_to_display", habit_num);
                 editor.apply();
                 current_habit = habit_num;
                 displayHabitContent();
             }
         });
+        displayHabitContent();
 
         //MobileAds.initialize(getApplicationContext(),"ca-app-pub-5782047288878600~9640464773");
         AdView mAdView = (AdView) findViewById(R.id.adView);
@@ -142,43 +146,6 @@ public class MainActivity extends AppCompatActivity {
         textViewMotivation = (TextView) findViewById(R.id.textView_motivation);
         loadNewMotivation();
 
-
-        gridContent = (GridView) findViewById(R.id.content_grid);
-        displayHabitContent();
-
-        gridContent.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v,
-                                    int position, long id) {
-                long timeStart = getLongFromPrefs(HABIT_PREFS+current_habit,"date", 1490000000000L);
-                long timeDiff = System.currentTimeMillis() - timeStart;
-                long numDays =  TimeUnit.DAYS.convert(timeDiff,TimeUnit.MILLISECONDS);
-
-                if (position == numDays) {
-                    // Send intent to EditDayActivity
-                    Intent editDay = new Intent(getApplicationContext(), EditDayActivity.class);
-                    editDay.putExtra("clicked_position", position);
-                    editDay.putExtra("habit",getStringFromPrefs(HABIT_PREFS+current_habit,
-                            "habit",getString(R.string.edit_day_default)));
-
-                    startActivityForResult(editDay, EDIT_DAY_REQUEST);
-                }
-                else if (position == numDays+1) {
-                    // Clicked on tomorrow
-                    Toast.makeText(MainActivity.this, "Cannot edit tomorrow's entry", Toast.LENGTH_LONG).show();
-                }
-                else if (position < numDays) {
-                    // Clicked on an old entry
-                    String reason = getStringFromPrefs(HABIT_PREFS+current_habit,
-                            "log_reason_" + position,
-                            "You were so lazy, you didn't even give a reason!");
-                    //TODO: Add multiple praise randomised
-                    if (getIntFromPrefs(HABIT_PREFS+current_habit,"log_entry_"+position,-1) == 0)
-                        reason = "Well done, keep it up!";
-                    Toast.makeText(MainActivity.this, reason, Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -187,47 +154,12 @@ public class MainActivity extends AppCompatActivity {
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
-    public static String getStringFromPrefs(Context ctx, String pref, String key, String default_return){
-        //TODO: Use this everywhere!
-        SharedPreferences log = ctx.getSharedPreferences(pref, 0);
-        return log.getString(key, default_return);
-    }
-
-    // Overload method for non-static calls
-    public String getStringFromPrefs(String pref, String key, String default_return){
-        return getStringFromPrefs(this, pref, key, default_return);
-    }
-
-    public static int getIntFromPrefs(Context ctx, String pref, String key, int default_return){
-        SharedPreferences log = ctx.getSharedPreferences(pref, 0);
-        return log.getInt(key, default_return);
-    }
-
-    // Overload method for non-static calls
-    public int getIntFromPrefs(String pref, String key, int default_return){
-        return getIntFromPrefs(this, pref, key, default_return);
-    }
-
-    public static long getLongFromPrefs(Context ctx, String pref, String key, long default_return){
-        SharedPreferences log = ctx.getSharedPreferences(pref, 0);
-        return log.getLong(key, default_return);
-    }
-
-    // Overload method for non-static calls
-    public long getLongFromPrefs(String pref, String key, long default_return){
-        return getLongFromPrefs(this, pref, key, default_return);
-    }
-
-
     public void displayHabitContent(){
-        int[] log_entries = new int[NUM_LOG_ENTRIES];
         SharedPreferences habit_log = getSharedPreferences(HABIT_PREFS+current_habit, 0);
 
         // Include/Exclude legit excuses based on settings
         SharedPreferences settingsPref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean includeLegit = settingsPref.getBoolean(SettingsActivity.KEY_PREF_LEGIT_SWITCH, false);
-
-
 
         long timeDiff = System.currentTimeMillis() - habit_log.getLong("date", 1490000000000L);
         long numDays =  TimeUnit.DAYS.convert(timeDiff,TimeUnit.MILLISECONDS);
@@ -235,20 +167,20 @@ public class MainActivity extends AppCompatActivity {
         streak_current = 0; streak_longest = 0;
         days_success = 0; days_fail = 0; days_fail_legit = 0;
         for (int i = 0; i < NUM_LOG_ENTRIES; i++) {
-            log_entries[i] = habit_log.getInt("log_entry_" + i, -1);
+            int log_enty = habit_log.getInt("log_entry_" + i, -1);
 
-            if (log_entries[i] == -1 && i < numDays)
-                log_entries[i] = 1;             // Assume failure with no report
+            if (log_enty == -1 && i < numDays)
+                log_enty = 1;             // Assume failure with no report
 
-            if (log_entries[i] == 0) {          // Successful day
+            if (log_enty == 0) {          // Successful day
                 days_success ++;
                 streak_current ++;
             }
-            else if (log_entries[i] == 1){      // Failure with no legit reason
+            else if (log_enty == 1){      // Failure with no legit reason
                 days_fail ++;
                 streak_current = 0;
             }
-            else if (log_entries[i] == 2){      // Failure with legit reason
+            else if (log_enty == 2){      // Failure with legit reason
                 if (includeLegit){
                     days_success ++;
                     streak_current ++;
@@ -268,9 +200,6 @@ public class MainActivity extends AppCompatActivity {
         else textViewSuccessRate.setText(String.format(Locale.UK,"%.1f%%",((100.0*days_success)/total_days)));
         textViewCurrentStreak.setText(String.format(Locale.UK,"%d",streak_current));
         textViewLongestStreak.setText(String.format(Locale.UK,"%d",streak_longest));
-
-        //Initialise gridContent with latest log_entries
-        gridContent.setAdapter(new ImageAdapter(this, log_entries));
     }
 
 
@@ -357,6 +286,36 @@ public class MainActivity extends AppCompatActivity {
         client.disconnect();
     }
 
+    public static String getStringFromPrefs(Context ctx, String pref, String key, String default_return){
+        SharedPreferences log = ctx.getSharedPreferences(pref, 0);
+        return log.getString(key, default_return);
+    }
+
+    // Overload method for non-static calls
+    public String getStringFromPrefs(String pref, String key, String default_return){
+        return getStringFromPrefs(this, pref, key, default_return);
+    }
+
+    public static int getIntFromPrefs(Context ctx, String pref, String key, int default_return){
+        SharedPreferences log = ctx.getSharedPreferences(pref, 0);
+        return log.getInt(key, default_return);
+    }
+
+    // Overload method for non-static calls
+    public int getIntFromPrefs(String pref, String key, int default_return){
+        return getIntFromPrefs(this, pref, key, default_return);
+    }
+
+    public static long getLongFromPrefs(Context ctx, String pref, String key, long default_return){
+        SharedPreferences log = ctx.getSharedPreferences(pref, 0);
+        return log.getLong(key, default_return);
+    }
+
+    // Overload method for non-static calls
+    public long getLongFromPrefs(String pref, String key, long default_return){
+        return getLongFromPrefs(this, pref, key, default_return);
+    }
+
     public void onButtonNextMotivationClick(View view){
         loadNewMotivation();
     }
@@ -370,6 +329,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void deleteHabit(){
+        //TODO: Remove notification
 
         final SharedPreferences habit_log = getSharedPreferences(HABIT_PREFS+current_habit, 0);
         final String habitText = habit_log.getString("habit","Habit");
@@ -444,17 +404,19 @@ public class MainActivity extends AppCompatActivity {
     public int[] loadHabitMap(){ return loadHabitMap(this);}
 
     public int currentHabitIndex(){
+        return habitIndex(current_habit);
+    }
+
+    public int habitIndex(int num){
         int[] map = loadHabitMap();
         int i = 0;
         while(i<map.length){
-            if (map[i] == current_habit)
+            if (map[i] == num)
                 return i;
             i++;
         }
         return 0;
     }
-
-    // TODO: public int habitIndex(int num)
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -484,6 +446,8 @@ public class MainActivity extends AppCompatActivity {
                 String reason = data.getStringExtra("reason");
                 if (reason != null) habit_editor.putString("log_reason_" + log_position, reason);
                 habit_editor.apply();
+                // Need to recreate in order to update the viewPager
+                recreate();
                 displayHabitContent();
             }
             else if (requestCode == NEW_HABIT_REQUEST) {
@@ -503,9 +467,10 @@ public class MainActivity extends AppCompatActivity {
                 habit_editor.putString("habit_summary", newHabitText.split(" ", 2)[0]);
                 habit_editor.putInt("notify", newHabitTime);
 
-                // Save first day, setting hours and minutes to zero.
+                // Save first day, setting hours and minutes to zero
                 Calendar cal = Calendar.getInstance();
-                cal.setTimeInMillis(System.currentTimeMillis());
+                long timeNow = System.currentTimeMillis();
+                cal.setTimeInMillis(timeNow);
                 cal.set(Calendar.HOUR_OF_DAY,0);
                 cal.set(Calendar.MINUTE,0);
                 if (data.getBooleanExtra("tomorrow",true))
@@ -532,10 +497,21 @@ public class MainActivity extends AppCompatActivity {
 
     // Set a recurring notification
     public static void setHabitNotification(Context ctx, int habitNum){
+        // Return if Notifications switched off in settings
+        SharedPreferences settingsPref = PreferenceManager.getDefaultSharedPreferences(ctx);
+        boolean notify = settingsPref.getBoolean(SettingsActivity.KEY_PREF_NOTIFICATION_SWITCH, false);
+        if (!notify)
+            return;
+
         String habitText = getStringFromPrefs(ctx, HABIT_PREFS+habitNum,"habit","perform your habit");
         int habitTime = getIntFromPrefs(ctx, HABIT_PREFS+habitNum,"notify",18*60);
 
-        AlarmReceiver alarmReceiver = new AlarmReceiver();
+        // Add a day if the notification time is already passed today
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(System.currentTimeMillis());
+        if(cal.get(Calendar.HOUR_OF_DAY)*60 + cal.get(Calendar.MINUTE) > habitTime)
+            habitTime += 24*60;
+
         alarmReceiver.setAlarm(ctx, habitText, habitNum, habitTime);
     }
 
@@ -551,8 +527,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-//    // Overload method for non-static calls
-//    public void setAllNotificatoins(){ setAllNotifications(this);}
+    // Overload method for non-static calls
+    public void setAllNotifications(){ setAllNotifications(this);}
+
+    // Clear a notification
+    public static void cancelAllNotifications(Context ctx){
+        int[] map = loadHabitMap(ctx);
+        int i = 0;
+        while(i<map.length) {
+            // Call setHabitNotification for alarmReceiver to set up the correct intent to enable
+            // cancelling the individual notificatoin
+            setHabitNotification(ctx, map[i]);
+            alarmReceiver.cancelAlarm(ctx);
+            i++;
+        }
+    }
 
     public void loadNewMotivation(){
         //Start network thread here
@@ -642,7 +631,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public CharSequence getPageTitle(int position) {
             // PageTitle displays habit summaries in tabs above the Fragments being swiped
-            int habitNum = loadHabitMap()[position];
+            int habitNum = habitIndex(position);
             return getStringFromPrefs(HABIT_PREFS+habitNum, "habit_summary", "Habit");
         }
     }

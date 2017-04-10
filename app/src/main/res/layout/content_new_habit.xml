@@ -28,7 +28,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="0dp" />
 
         <TextView
             android:text="@string/new_habit_2"
