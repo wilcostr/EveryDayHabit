@@ -16,7 +16,6 @@ import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-
 public class EditDayActivity extends AppCompatActivity {
 
     Intent requestIntent;
@@ -34,9 +33,9 @@ public class EditDayActivity extends AppCompatActivity {
         // Get intent data
         requestIntent = getIntent();
         textViewHabit = (TextView)findViewById(R.id.text_view_habit);
-        //TODO: Use strings resource here
-        textViewHabit.setText("Did you " +
-                requestIntent.getStringExtra("habit").toLowerCase() + " today?");
+        textViewHabit.setText(getString(R.string.edit_day_did_you) +
+                requestIntent.getStringExtra("habit").toLowerCase() +
+                getString(R.string.edit_day_today));
 
         //These start off invisible
         final TextView textView2 = (TextView) findViewById(R.id.textView2);
@@ -49,7 +48,6 @@ public class EditDayActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 // checkedId is the RadioButton selected
-                System.out.println("checkedId: " + checkedId);
                 if (checkedId == R.id.radioButton_yes ){
                     textView2.setVisibility(View.GONE);
                     editText.setVisibility(View.GONE);
@@ -60,8 +58,6 @@ public class EditDayActivity extends AppCompatActivity {
                     editText.setVisibility(View.VISIBLE);
                     checkBox.setVisibility(View.VISIBLE);
                 }
-
-
             }
         });
         button_done.setOnClickListener(new View.OnClickListener() {
@@ -77,7 +73,6 @@ public class EditDayActivity extends AppCompatActivity {
                     if (legit) processClick(2);
                     else processClick(1);
                 }
-
             }
         });
 

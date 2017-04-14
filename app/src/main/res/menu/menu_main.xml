@@ -7,10 +7,6 @@
         android:orderInCategory="110"
         android:title="@string/action_settings" />
     <item
-        android:id="@+id/action_reset"
-        android:orderInCategory="101"
-        android:title="@string/action_reset" />
-    <item
         android:id="@+id/action_new_habit"
         android:orderInCategory="102"
         android:title="@string/action_new_habit"/>

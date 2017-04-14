@@ -34,7 +34,6 @@ public class AlarmReceiver extends BroadcastReceiver
     {
         int habitNum = intent.getIntExtra("habit_number",-1);
 
-        // TODO: Test MainActivity reliability against GC
         long timeStart = MainActivity.getLongFromPrefs(context, MainActivity.HABIT_PREFS+habitNum,
                 "date", 1490000000000L);
         long timeDiff = System.currentTimeMillis() - timeStart;
@@ -67,7 +66,8 @@ public class AlarmReceiver extends BroadcastReceiver
                 //.setContentText("Hello World!")
                 .setContentIntent(openMainPendingIntent)
                 .setAutoCancel(true)
-                .setCategory(CATEGORY_REMINDER);
+                .setCategory(CATEGORY_REMINDER)
+                .setVibrate(new long[]{1000, 200, 100, 200});
 
         NotificationManager mNotifyMgr = (NotificationManager)context.getSystemService(NOTIFICATION_SERVICE);
         // Builds the notification and issues it.
@@ -103,12 +103,14 @@ public class AlarmReceiver extends BroadcastReceiver
                 PackageManager.DONT_KILL_APP);
     }
 
-    public void cancelAlarm(Context context) {
+    public void cancelAlarm() {
         // If the alarm has been set, cancel it.
-        if (alarmMgr!= null) {
+        if (alarmMgr != null) {
             alarmMgr.cancel(alarmIntent);
         }
+    }
 
+    public void cancelBootReiver(Context context){
         // Disable {@code SampleBootReceiver} so that it doesn't automatically restart the
         // alarm when the device is rebooted.
         ComponentName receiver = new ComponentName(context, BootReceiver.class);

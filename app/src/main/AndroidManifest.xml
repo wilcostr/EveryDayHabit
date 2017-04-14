@@ -37,7 +37,8 @@
 
         <activity
             android:name=".EditDayActivity"
-            android:label="@string/title_activity_edit_day"
+            android:label="@string/edit_day_activity_title"
+            android:windowSoftInputMode="adjustResize"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -46,7 +47,7 @@
         </activity>
         <activity
             android:name=".NewHabitActivity"
-            android:label="@string/title_activity_new_habit"
+            android:label="@string/new_habit_activity_title"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data

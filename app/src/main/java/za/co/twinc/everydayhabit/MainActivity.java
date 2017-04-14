@@ -1,5 +1,6 @@
 package za.co.twinc.everydayhabit;
 
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -45,9 +46,10 @@ public class MainActivity extends AppCompatActivity {
     public static final String MAIN_PREFS = "main_app_prefs";
     public static final String HABIT_PREFS = "habit_prefs_";
     public static final int NUM_LOG_ENTRIES = 49;
-    public static final int EDIT_DAY_REQUEST = 1;
-    static final int NEW_HABIT_REQUEST = 2;
-    static final int SETTINGS_REQUEST = 3;
+
+    public static final int EDIT_DAY_REQUEST    = 1;
+    public static final int NEW_HABIT_REQUEST   = 2;
+    static final int        SETTINGS_REQUEST    = 3;
 
     int streak_longest, streak_current, days_fail, days_fail_legit, days_success;
     int current_habit;
@@ -73,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences main_log = getSharedPreferences(MAIN_PREFS, 0);
 
-        // Try to get intent that opened main (only the case when opened from notification
+        // Try to get intent that opened main (only the case when opened from notification)
         Intent startMainIntent = getIntent();
         current_habit = -1;
         int currentDay = -1;
@@ -81,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
         if (startMainIntent != null) {
             current_habit = startMainIntent.getIntExtra("habit", -1);
             currentDay = startMainIntent.getIntExtra("day", -1);
+            System.out.println(startMainIntent.getStringExtra("reason"));
         }
 
         if (current_habit != -1){
@@ -110,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
         viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(swipeAdapter);
         viewPager.setCurrentItem(currentHabitIndex());
+        viewPager.setCurrentItem(currentHabitIndex());
 
         TabLayout tabs = (TabLayout) findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
@@ -126,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
             public void onPageSelected (int position) {
                 SharedPreferences main_log = getSharedPreferences(MAIN_PREFS, 0);
                 SharedPreferences.Editor editor = main_log.edit();
-                int habit_num = habitIndex(position);
+                int habit_num = habitNumFromIndex(position);
                 editor.putInt("habit_to_display", habit_num);
                 editor.apply();
                 current_habit = habit_num;
@@ -155,6 +159,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void displayHabitContent(){
+        // Quick return if we are displaying add new habit button
+        if (current_habit==-1) return;
+
         SharedPreferences habit_log = getSharedPreferences(HABIT_PREFS+current_habit, 0);
 
         // Include/Exclude legit excuses based on settings
@@ -233,10 +240,6 @@ public class MainActivity extends AppCompatActivity {
                 startSettings.putExtra("habit_date", dateString);
 
                 startActivityForResult(startSettings, SETTINGS_REQUEST);
-                return true;
-            case R.id.action_reset:
-                resetAll();
-                recreate();
                 return true;
             case R.id.action_new_habit:
                 Intent newHabit = new Intent(getApplicationContext(), NewHabitActivity.class);
@@ -320,18 +323,17 @@ public class MainActivity extends AppCompatActivity {
         loadNewMotivation();
     }
 
-    public void resetAll(){
-        //TODO: Reset all shared preferences
-        SharedPreferences log = getSharedPreferences(MAIN_PREFS, 0);
-        SharedPreferences.Editor editor = log.edit();
-        editor.clear();
-        editor.apply();
-    }
-
     public void deleteHabit(){
-        //TODO: Remove notification
+        // Can't delete the button
+        if (current_habit == -1) return;
+
+        // Remove notification
+        // Call setHabitNotification for alarmReceiver to set up the correct intent to cancel
+        setHabitNotification(getApplicationContext(), current_habit);
+        alarmReceiver.cancelAlarm();
 
         final SharedPreferences habit_log = getSharedPreferences(HABIT_PREFS+current_habit, 0);
+
         final String habitText = habit_log.getString("habit","Habit");
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -340,23 +342,28 @@ public class MainActivity extends AppCompatActivity {
         builder.setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
 
-                //Wipe shared preferences log for habit
+                // Wipe shared preferences log for habit
                 SharedPreferences.Editor habit_editor = habit_log.edit();
                 habit_editor.clear();
 
-                //Get shared preferences of main log
+                // Get shared preferences of main log
                 SharedPreferences main_log = getSharedPreferences(MAIN_PREFS, 0);
                 int size = main_log.getInt("num_habits",0);
                 SharedPreferences.Editor main_editor = main_log.edit();
                 main_editor.putInt("num_habits", size-1);
 
+                // Shift all habits after current_habit by one to overwrite current_habit
                 int[] habitMap = loadHabitMap();
-                boolean move = false;
+                boolean shift = false;
                 for (int i=0; i<size; i++){
-                    if(move)
+                    if(shift)
                         habitMap[i-1] = habitMap[i];
-                    if(habitMap[i] == current_habit)
-                        move = true;
+                    if(habitMap[i] == current_habit){
+                        shift = true;
+                        // Display the next habit (limit to new size-1 if last habit deleted)
+                        current_habit = habitMap[Math.min(i+1, size-2)];
+                    }
+
                 }
 
                 Toast.makeText(MainActivity.this, habitText+" has been deleted.",
@@ -365,12 +372,7 @@ public class MainActivity extends AppCompatActivity {
                 habit_editor.apply();
                 main_editor.apply();
                 saveHabitMap(habitMap);
-
-                //TODO: Not display first habit after delete
-                current_habit = habitMap[0];
                 swipeAdapter.notifyDataSetChanged();
-                viewPager.setCurrentItem(0);
-
             }
         });
 
@@ -380,7 +382,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         builder.create().show();
-
     }
 
     public boolean saveHabitMap(int[] map){
@@ -404,19 +405,25 @@ public class MainActivity extends AppCompatActivity {
     public int[] loadHabitMap(){ return loadHabitMap(this);}
 
     public int currentHabitIndex(){
-        return habitIndex(current_habit);
-    }
-
-    public int habitIndex(int num){
         int[] map = loadHabitMap();
         int i = 0;
         while(i<map.length){
-            if (map[i] == num)
+            if (map[i] == current_habit)
                 return i;
             i++;
         }
         return 0;
     }
+
+    public static int habitNumFromIndex(Context ctx, int idx){
+        if (idx < getIntFromPrefs(ctx, MAIN_PREFS, "num_habits",0))
+            return loadHabitMap(ctx)[idx];
+        // Return -1 if index exceeds limit
+        return -1;
+    }
+
+    // Overload method for non-static calls
+    public int habitNumFromIndex(int idx) { return habitNumFromIndex(this, idx);}
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -431,12 +438,20 @@ public class MainActivity extends AppCompatActivity {
                 habit_editor.putInt("notify", data.getIntExtra("habit_time",0));
                 habit_editor.apply();
 
-                //TODO update habit notification if anything changed.
+                // Update notification
+                setHabitNotification(current_habit);
 
+                // Update display
                 swipeAdapter.notifyDataSetChanged();
-                recreate();
+                displayHabitContent();
+
             }
             else if (requestCode == EDIT_DAY_REQUEST) {
+                // Cancel the notification if it is still visible
+                NotificationManager mNotifyMgr = (NotificationManager)getApplicationContext().getSystemService(NOTIFICATION_SERVICE);
+                mNotifyMgr.cancel(current_habit);
+
+                // Update habit_log
                 SharedPreferences habit_log = getSharedPreferences(HABIT_PREFS+current_habit, 0);
                 SharedPreferences.Editor habit_editor = habit_log.edit();
                 int log_position = data.getIntExtra("clicked_position",0);
@@ -446,8 +461,7 @@ public class MainActivity extends AppCompatActivity {
                 String reason = data.getStringExtra("reason");
                 if (reason != null) habit_editor.putString("log_reason_" + log_position, reason);
                 habit_editor.apply();
-                // Need to recreate in order to update the viewPager
-                recreate();
+                swipeAdapter.notifyDataSetChanged();
                 displayHabitContent();
             }
             else if (requestCode == NEW_HABIT_REQUEST) {
@@ -491,7 +505,6 @@ public class MainActivity extends AppCompatActivity {
                 // Set notification
                 setHabitNotification(next_habit);
             }
-
         }
     }
 
@@ -536,11 +549,13 @@ public class MainActivity extends AppCompatActivity {
         int i = 0;
         while(i<map.length) {
             // Call setHabitNotification for alarmReceiver to set up the correct intent to enable
-            // cancelling the individual notificatoin
+            // cancelling the individual notification
             setHabitNotification(ctx, map[i]);
-            alarmReceiver.cancelAlarm(ctx);
+            alarmReceiver.cancelAlarm();
             i++;
         }
+        // Stop notifications being set on device boot
+        alarmReceiver.cancelBootReiver(ctx);
     }
 
     public void loadNewMotivation(){
@@ -625,14 +640,21 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return getIntFromPrefs(MAIN_PREFS, "num_habits", 0);
+            return getIntFromPrefs(MAIN_PREFS, "num_habits", 0) + 1;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            // PageTitle displays habit summaries in tabs above the Fragments being swiped
-            int habitNum = habitIndex(position);
+            // Add new habit at end of habit list
+            if (getIntFromPrefs(MAIN_PREFS, "num_habits",0)-1 < position) return "New Habit";
+
+            // Return habit summary for tab title
+            int habitNum = habitNumFromIndex(position);
             return getStringFromPrefs(HABIT_PREFS+habitNum, "habit_summary", "Habit");
+        }
+
+        public int getItemPosition(Object object){
+            return POSITION_NONE;
         }
     }
 }

@@ -9,9 +9,12 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.text.format.DateFormat;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.TimePicker;
@@ -31,7 +34,31 @@ public class NewHabitActivity extends AppCompatActivity {
         if (actionBar != null)
             actionBar.setDisplayHomeAsUpEnabled(true);
 
-        //TODO: Hide Button till a habit is entered
+        // Hide Button till a habit is entered
+        final Button buttonDone = (Button)findViewById(R.id.button_add_habit);
+        buttonDone.setEnabled(false);
+
+        EditText editTextHabit = (EditText)findViewById(R.id.editTextHabit);
+        editTextHabit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(charSequence.toString().trim().length()==0){
+                    buttonDone.setEnabled(false);
+                } else {
+                    buttonDone.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 

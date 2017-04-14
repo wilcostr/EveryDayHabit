@@ -24,7 +24,8 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         style="@style/B18TextViewStyle"
-        android:textAlignment="textStart" />
+        android:textAlignment="textStart"
+        android:gravity="start"/>
 
     <RadioGroup
         android:layout_width="match_parent"
@@ -39,14 +40,14 @@
         android:layout_alignParentStart="true">
 
         <RadioButton
-            android:text="Yes"
+            android:text="@string/edit_day_yes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/radioButton_yes"
             android:layout_weight="1" />
 
         <RadioButton
-            android:text="No"
+            android:text="@string/edit_day_no"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/radioButton_no"
@@ -56,7 +57,7 @@
 
 
     <TextView
-        android:text="Why were you unsuccessful?"
+        android:text="@string/edit_day_why"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textView2"
@@ -79,11 +80,11 @@
         android:background="#DDD"
         android:selectAllOnFocus="false"
         android:visibility="gone"
-        android:hint="Enter your lame excuse here"
+        android:hint="@string/edit_day_reason"
         android:padding="10dp" />
 
     <CheckBox
-        android:text="My reason is actually legit"
+        android:text="@string/edit_day_legit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="34dp"
@@ -97,7 +98,7 @@
         android:visibility="gone"/>
 
     <Button
-        android:text="Done"
+        android:text="@string/edit_day_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="28dp"

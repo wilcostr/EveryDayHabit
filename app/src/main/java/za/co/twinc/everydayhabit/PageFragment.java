@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,11 +17,13 @@ import java.util.concurrent.TimeUnit;
 
 import static za.co.twinc.everydayhabit.MainActivity.EDIT_DAY_REQUEST;
 import static za.co.twinc.everydayhabit.MainActivity.HABIT_PREFS;
+import static za.co.twinc.everydayhabit.MainActivity.MAIN_PREFS;
+import static za.co.twinc.everydayhabit.MainActivity.NEW_HABIT_REQUEST;
 import static za.co.twinc.everydayhabit.MainActivity.NUM_LOG_ENTRIES;
 import static za.co.twinc.everydayhabit.MainActivity.getIntFromPrefs;
 import static za.co.twinc.everydayhabit.MainActivity.getLongFromPrefs;
 import static za.co.twinc.everydayhabit.MainActivity.getStringFromPrefs;
-import static za.co.twinc.everydayhabit.MainActivity.loadHabitMap;
+import static za.co.twinc.everydayhabit.MainActivity.habitNumFromIndex;
 
 /**
  * Created by wilco on 2017/04/02.
@@ -42,15 +45,35 @@ public class PageFragment extends Fragment {
         Bundle bundle = getArguments();
 
         textViewHabit = (TextView) view.findViewById(R.id.textView_swipe);
+        gridContent = (GridView) view.findViewById(R.id.content_grid);
+
+        int habitPosition = bundle.getInt("num");
+        if (habitPosition+1 > getIntFromPrefs(getContext(),MAIN_PREFS,"num_habits",0)){
+            // Display add new habit button
+            textViewHabit.setText("Add New Habit");
+            gridContent.setVisibility(View.GONE);
+
+            ImageButton newHabitButton = (ImageButton) view.findViewById(R.id.button_new_habit);
+            newHabitButton.setVisibility(View.VISIBLE);
+
+            newHabitButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent newHabit = new Intent(getContext(), NewHabitActivity.class);
+                    getActivity().startActivityForResult(newHabit, NEW_HABIT_REQUEST);
+                }
+            });
+
+            return view;
+        }
 
         // Load Shared Preferences of habit
-        habitNum = loadHabitMap(getContext())[bundle.getInt("num")];
+        habitNum = habitNumFromIndex(getContext(), habitPosition);
         String habitText = getStringFromPrefs(getContext(), HABIT_PREFS+habitNum,
                 "habit", "No Habit Set");
 
         textViewHabit.setText(habitText);
 
-        gridContent = (GridView) view.findViewById(R.id.content_grid);
         displayHabitContent();
 
         gridContent.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -59,6 +82,10 @@ public class PageFragment extends Fragment {
                 long timeStart = getLongFromPrefs(getContext(),HABIT_PREFS+habitNum,"date", 1490000000000L);
                 long timeDiff = System.currentTimeMillis() - timeStart;
                 long numDays =  TimeUnit.DAYS.convert(timeDiff,TimeUnit.MILLISECONDS);
+
+                // Fix numDays if only starting tomorrow
+                if (timeDiff < 0)
+                    numDays = -1;
 
                 if (position == numDays) {
                     // Send intent to EditDayActivity
@@ -102,7 +129,7 @@ public class PageFragment extends Fragment {
                 log_entries[i] = 1;             // Assume failure with no report
         }
 
-        //Initialise gridContent with latest log_entries
+        // Initialise gridContent with latest log_entries
         gridContent.setAdapter(new ImageAdapter(getContext(), log_entries));
     }
 }

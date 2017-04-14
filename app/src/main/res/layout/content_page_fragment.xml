@@ -20,7 +20,16 @@
         android:verticalSpacing="10dp"
         android:horizontalSpacing="10dp"
         android:gravity="center"
-        android:padding="10dp"
-        android:layout_marginTop="8dp"/>
+        android:padding="10dp"/>
+
+    <ImageButton
+        android:id="@+id/button_new_habit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="40dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/button_add"
+        android:visibility="gone" />
 
 </LinearLayout>
