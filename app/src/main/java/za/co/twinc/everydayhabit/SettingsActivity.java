@@ -5,6 +5,9 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
@@ -29,6 +32,7 @@ public class SettingsActivity extends Activity {
     public static final String KEY_PREF_NOTIFICATION_TIME =     "time_picker_preference_notification";
     public static final String KEY_PREF_NOTIFICATION_SWITCH =   "switch_preference_notification";
     public static final String KEY_PREF_LEGIT_SWITCH =          "switch_preference_legit";
+    public static final String KEY_PREF_NOTIFICATION_TONE =     "ringtone_preference";
 
     public static final String KEY_PREF_DATE = "simple_text_habit_date";
 
@@ -88,11 +92,15 @@ public class SettingsActivity extends Activity {
                             else intent.putExtra("habit_summary",prefs.getString(key,""));
                         }
                         else if (key.equals(KEY_PREF_NOTIFICATION_SWITCH)){
-                            Preference pref = findPreference(key);
-                            if (((SwitchPreference)pref).isChecked())
+                            Preference pref = findPreference(KEY_PREF_NOTIFICATION_TONE);
+                            if (((SwitchPreference)findPreference(key)).isChecked()) {
                                 MainActivity.setAllNotifications(getActivity());
-                            else
+                                pref.setEnabled(true);
+                            }
+                            else {
                                 MainActivity.cancelAllNotifications(getActivity());
+                                pref.setEnabled(false);
+                            }
                         }
                     }
                 };
@@ -119,6 +127,28 @@ public class SettingsActivity extends Activity {
             p = getPreferenceManager().findPreference(KEY_PREF_HABIT_SUMMARY);
             p.setSummary(intent.getStringExtra("habit_summary"));
             ((EditTextPreference)p).setText(intent.getStringExtra("habit_summary"));
+
+            // Set notification tone
+            // TODO: Does this preference need to be disabled by default?
+            p = getPreferenceManager().findPreference(KEY_PREF_NOTIFICATION_TONE);
+            p.setDefaultValue("DEFAULT_NOTIFICATION_URI");
+            String toneStr = getPreferenceManager().getSharedPreferences()
+                    .getString(KEY_PREF_NOTIFICATION_TONE, "DEFAULT_NOTIFICATION_URI");
+            Ringtone tone = RingtoneManager.getRingtone(getActivity(), Uri.parse(toneStr));
+            p.setSummary(tone.getTitle(getActivity()));
+            if (p.getSummary().equals("Unknown ringtone")) p.setSummary("None");
+
+            p.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object o) {
+                    Ringtone tone = RingtoneManager.getRingtone(getActivity(), Uri.parse((String)o));
+                    preference.setSummary(tone.getTitle(getActivity()));
+                    if (preference.getSummary().equals("Unknown ringtone")) preference.setSummary("None");
+                    // TODO: Test - This might still use the old notification sound...
+                    MainActivity.setAllNotifications(getActivity());
+                    return true;
+                }
+            });
 
             // Set habit start date
             p = getPreferenceManager().findPreference(KEY_PREF_DATE);
@@ -165,6 +195,11 @@ public class SettingsActivity extends Activity {
             timePref.setSummary(String.format(Locale.UK, "%02d",hour)  + ":" +
                                 String.format(Locale.UK, "%02d",minute));
             intent.putExtra("habit_time", hour*60+minute);
+        }
+
+        @Override
+        public void onActivityResult(int requestCode, int resultCode, Intent data) {
+            super.onActivityResult(requestCode,resultCode,data);
         }
     }
 

@@ -8,6 +8,11 @@
             android:defaultValue="true"
             android:title="@string/preference_notifications"
             android:key="switch_preference_notification" />
+        <RingtonePreference
+            android:showDefault="true"
+            android:key="ringtone_preference"
+            android:ringtoneType="notification"
+            android:title="@string/preference_notification_tone" />
         <SwitchPreference
             android:defaultValue="false"
             android:title="@string/preference_accept_excuses"

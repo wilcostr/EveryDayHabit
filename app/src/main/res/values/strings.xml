@@ -50,7 +50,7 @@
 
     <string name="default_habit_text">Default Habit Text</string>
     <string name="default_habit_word">Habit</string>
-
+    <string name="preference_notification_tone">Notification Tone</string>
 
 
 </resources>

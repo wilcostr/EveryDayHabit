@@ -7,7 +7,10 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
@@ -59,6 +62,10 @@ public class AlarmReceiver extends BroadcastReceiver
         PendingIntent openMainPendingIntent = stackBuilder.getPendingIntent(habitNum,
                 PendingIntent.FLAG_ONE_SHOT);
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String ringtonePreference = prefs.getString(SettingsActivity.KEY_PREF_NOTIFICATION_TONE, "DEFAULT_NOTIFICATION_URI");
+        Uri ringtoneUri = Uri.parse(ringtonePreference);
+
         // Create notification builder
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.mipmap.ic_launcher_edh)
@@ -67,7 +74,8 @@ public class AlarmReceiver extends BroadcastReceiver
                 .setContentIntent(openMainPendingIntent)
                 .setAutoCancel(true)
                 .setCategory(CATEGORY_REMINDER)
-                .setVibrate(new long[]{1000, 200, 100, 200});
+                .setVibrate(new long[]{1000, 200, 100, 200})
+                .setSound(ringtoneUri);
 
         NotificationManager mNotifyMgr = (NotificationManager)context.getSystemService(NOTIFICATION_SERVICE);
         // Builds the notification and issues it.
