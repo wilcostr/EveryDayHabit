@@ -9,6 +9,10 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
 
+import java.util.Locale;
+
+import static za.co.twinc.everydayhabit.MainActivity.NUM_LOG_ENTRIES;
+
 /*
  * Created by wilco on 2016/11/03.
  */
@@ -25,8 +29,7 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     public int getCount() {
-        //TODO: Not hardcode this
-        return 49;
+        return NUM_LOG_ENTRIES;
     }
 
     public Object getItem(int position) {
@@ -50,7 +53,7 @@ public class ImageAdapter extends BaseAdapter {
                 textV.setBackgroundResource(ticks[items[position]]);
             }
             else{
-                textV.setText(""+(position+1));
+                textV.setText(String.format(Locale.UK, "%d", position + 1));
                 textV.setTextSize(18);
                 textV.setTypeface(null, Typeface.BOLD);
                 textV.setGravity(Gravity.CENTER);

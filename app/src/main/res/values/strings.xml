@@ -4,6 +4,7 @@
     <string name="action_settings">Settings</string>
     <string name="action_reset">Reset</string>
     <string name="action_new_habit">New Habit</string>
+    <string name="action_startup_info">Info</string>
 
     <string name="button_2_text">Reset</string>
 
@@ -46,11 +47,48 @@
     <string name="preference_category_specific">Habit Settings</string>
     <string name="preference_accept_excuses">Accept Legitimate Excuses</string>
     <string name="preference_excuses_summary_on">Legitimate excuses will not break streaks</string>
-    <string name="preference_excuses_summary_off">Legitimate excuses are considered missed days and will break streaks</string>
+    <string name="preference_excuses_summary_off">Legitimate excuses are considered missed days
+        and will break streaks</string>
 
     <string name="default_habit_text">Default Habit Text</string>
     <string name="default_habit_word">Habit</string>
     <string name="preference_notification_tone">Notification Tone</string>
+
+    <string name="txt_habit">Habit</string>
+    <string name="txt_new_habit">New Habit</string>
+    <string name="txt_add_new_habit">Add New Habit</string>
+    <string name="txt_no_reason">You didn\'t log a reason</string>
+
+    <string name="first_use_activity_title">EveryDayHabit</string>
+    <string name="first_use_button">Let\'s Get Started</string>
+    <string name="first_use_text">Welcome to EveryDayHabit.\n
+        \nHabits are powerful mini auto-pilot scripts that kick in with very specific triggers.
+        They free up our mental capacity by essentially removing the need to make active decisions
+        or to respond to stimuli while the habit script is running. Habits are not only executed
+        automatically, but are also formed automatically, with our brains constantly searching for
+        behavioural patterns to automate in order to optimise our day to day lives.
+        This might make habits hard to break, but luckily makes it fairly straight forward
+        to form new positive habits.\n
+
+        \nTo achieve your ultimate goal will require effort and perseverance, but to establish a
+        relevant micro habit to get you started does not. By breaking the steps down into the
+        simplest possible daily activity that would take very little time and physical effort to
+        complete, habit formation is a walk in the park.\n
+
+        \nEvery habit starts with a trigger. The easiest way to approach the formation of a new
+        habit is to piggyback it on another habitual daily activity.
+        Another option is to use the trigger of a bad habit you want to drop and substitute your
+        new positive habit. If you do this, make sure that the new habit has a similar <i>reward</i>
+        to the bad habit you are replacing.\n
+
+        \nWith EveryDayHabit there are also no Mondays and no first-of-the-months,
+        only the very next day. Your habit starts right now.\n
+
+        \nThere are many great resources out there on habit formation and the powerful impact
+        habits have on our lives, but these are the basics you need to get started. Make it simple,
+        keep the trigger and reward consistent, and do it every day!
+    </string>
+
 
 
 </resources>

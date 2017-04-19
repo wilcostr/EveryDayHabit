@@ -50,7 +50,7 @@ public class PageFragment extends Fragment {
         int habitPosition = bundle.getInt("num");
         if (habitPosition+1 > getIntFromPrefs(getContext(),MAIN_PREFS,"num_habits",0)){
             // Display add new habit button
-            textViewHabit.setText("Add New Habit");
+            textViewHabit.setText(getString(R.string.txt_add_new_habit));
             gridContent.setVisibility(View.GONE);
 
             ImageButton newHabitButton = (ImageButton) view.findViewById(R.id.button_new_habit);
@@ -104,7 +104,7 @@ public class PageFragment extends Fragment {
                     // Clicked on an old entry
                     String reason = getStringFromPrefs(getContext(),HABIT_PREFS+habitNum,
                             "log_reason_" + position,
-                            "You were so lazy, you didn't even give a reason!");
+                            getString(R.string.txt_no_reason));
                     //TODO: Add multiple praise randomised
                     if (getIntFromPrefs(getContext(), HABIT_PREFS+habitNum,"log_entry_"+position,-1) == 0)
                         reason = "Well done, keep it up!";

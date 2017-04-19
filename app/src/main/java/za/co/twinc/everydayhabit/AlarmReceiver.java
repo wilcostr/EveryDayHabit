@@ -100,7 +100,16 @@ public class AlarmReceiver extends BroadcastReceiver
 
         alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP,
                 calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmIntent);
+    }
 
+    public void cancelAlarm() {
+        // If the alarm has been set, cancel it.
+        if (alarmMgr != null) {
+            alarmMgr.cancel(alarmIntent);
+        }
+    }
+
+    public void setBootReceiver(Context context){
         // Enable {@code SampleBootReceiver} to automatically restart the alarm when the
         // device is rebooted.
         ComponentName receiver = new ComponentName(context, BootReceiver.class);
@@ -109,13 +118,6 @@ public class AlarmReceiver extends BroadcastReceiver
         pm.setComponentEnabledSetting(receiver,
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                 PackageManager.DONT_KILL_APP);
-    }
-
-    public void cancelAlarm() {
-        // If the alarm has been set, cancel it.
-        if (alarmMgr != null) {
-            alarmMgr.cancel(alarmIntent);
-        }
     }
 
     public void cancelBootReiver(Context context){

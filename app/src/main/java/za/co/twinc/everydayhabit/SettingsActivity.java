@@ -144,8 +144,6 @@ public class SettingsActivity extends Activity {
                     Ringtone tone = RingtoneManager.getRingtone(getActivity(), Uri.parse((String)o));
                     preference.setSummary(tone.getTitle(getActivity()));
                     if (preference.getSummary().equals("Unknown ringtone")) preference.setSummary("None");
-                    // TODO: Test - This might still use the old notification sound...
-                    MainActivity.setAllNotifications(getActivity());
                     return true;
                 }
             });

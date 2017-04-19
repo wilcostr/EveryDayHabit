@@ -83,7 +83,6 @@ public class MainActivity extends AppCompatActivity {
         if (startMainIntent != null) {
             current_habit = startMainIntent.getIntExtra("habit", -1);
             currentDay = startMainIntent.getIntExtra("day", -1);
-            System.out.println(startMainIntent.getStringExtra("reason"));
         }
 
         if (current_habit != -1){
@@ -101,6 +100,12 @@ public class MainActivity extends AppCompatActivity {
         }
         else{
             current_habit = main_log.getInt("habit_to_display",0);
+        }
+
+        // Display First Use Info if no habits created
+        if (getIntFromPrefs(MAIN_PREFS,"num_habits",0) == 0){
+            Intent intent = new Intent(getApplicationContext(), FirstUseActivity.class);
+            startActivity(intent);
         }
 
         // Set alarmReceiver for notifications
@@ -248,6 +253,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_delete_habit:
                 deleteHabit();
                 return true;
+            case R.id.action_start:
+                Intent intent = new Intent(getApplicationContext(), FirstUseActivity.class);
+                startActivity(intent);
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -352,18 +360,21 @@ public class MainActivity extends AppCompatActivity {
                 SharedPreferences.Editor main_editor = main_log.edit();
                 main_editor.putInt("num_habits", size-1);
 
-                // Shift all habits after current_habit by one to overwrite current_habit
-                int[] habitMap = loadHabitMap();
-                boolean shift = false;
-                for (int i=0; i<size; i++){
-                    if(shift)
-                        habitMap[i-1] = habitMap[i];
-                    if(habitMap[i] == current_habit){
-                        shift = true;
-                        // Display the next habit (limit to new size-1 if last habit deleted)
-                        current_habit = habitMap[Math.min(i+1, size-2)];
-                    }
+                if (size>1) {
+                    // Shift all habits after current_habit by one to overwrite current_habit
+                    int[] habitMap = loadHabitMap();
+                    boolean shift = false;
+                    for (int i = 0; i < size; i++) {
+                        if (shift)
+                            habitMap[i - 1] = habitMap[i];
+                        if (habitMap[i] == current_habit) {
+                            shift = true;
+                            // Display the next habit (limit to new size-1 if last habit deleted)
+                            current_habit = habitMap[Math.min(i + 1, size - 2)];
+                        }
 
+                    }
+                    saveHabitMap(habitMap);
                 }
 
                 Toast.makeText(MainActivity.this, habitText+" has been deleted.",
@@ -371,7 +382,6 @@ public class MainActivity extends AppCompatActivity {
 
                 habit_editor.apply();
                 main_editor.apply();
-                saveHabitMap(habitMap);
                 swipeAdapter.notifyDataSetChanged();
             }
         });
@@ -504,6 +514,8 @@ public class MainActivity extends AppCompatActivity {
 
                 // Set notification
                 setHabitNotification(next_habit);
+                // Activate boot receiver if this is the first habit added
+                if (num_habits==0) alarmReceiver.setBootReceiver(getApplicationContext());
             }
         }
     }
@@ -538,6 +550,7 @@ public class MainActivity extends AppCompatActivity {
             setHabitNotification(ctx, map[i]);
             i++;
         }
+        alarmReceiver.setBootReceiver(ctx);
     }
 
     // Overload method for non-static calls
@@ -646,11 +659,12 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public CharSequence getPageTitle(int position) {
             // Add new habit at end of habit list
-            if (getIntFromPrefs(MAIN_PREFS, "num_habits",0)-1 < position) return "New Habit";
+            if (getIntFromPrefs(MAIN_PREFS, "num_habits",0)-1 < position)
+                return getString(R.string.txt_new_habit);
 
             // Return habit summary for tab title
             int habitNum = habitNumFromIndex(position);
-            return getStringFromPrefs(HABIT_PREFS+habitNum, "habit_summary", "Habit");
+            return getStringFromPrefs(HABIT_PREFS+habitNum, "habit_summary", getString(R.string.txt_habit));
         }
 
         public int getItemPosition(Object object){

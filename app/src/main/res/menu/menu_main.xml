@@ -14,6 +14,10 @@
         android:id="@+id/action_delete_habit"
         android:orderInCategory="103"
         android:title="@string/delete_habit"/>
+    <item
+        android:id="@+id/action_start"
+        android:orderInCategory="104"
+        android:title="@string/action_startup_info"/>
 
 
 </menu>

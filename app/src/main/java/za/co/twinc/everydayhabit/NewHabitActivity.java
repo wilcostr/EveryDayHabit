@@ -95,7 +95,7 @@ public class NewHabitActivity extends AppCompatActivity {
 
             //Return new habit details to main
             Intent requestIntent = getActivity().getIntent();
-            requestIntent.putExtra("habit", String.valueOf(editTextHabit.getText()));
+            requestIntent.putExtra("habit", String.valueOf(editTextHabit.getText()).trim());
             if(radioButtonTomorrow.isChecked()) requestIntent.putExtra("tomorrow", true);
             else requestIntent.putExtra("tomorrow", false);
             requestIntent.putExtra("time", hour*60+minute);
