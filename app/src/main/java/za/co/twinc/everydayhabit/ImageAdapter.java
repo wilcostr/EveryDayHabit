@@ -25,7 +25,7 @@ public class ImageAdapter extends BaseAdapter {
     public ImageAdapter(Context c, int[] log_items) {
         mContext = c;
         items = log_items;
-        ticks = new int[]{R.drawable.tick_green, R.drawable.tick_red, R.drawable.tick_orange_2};
+        ticks = new int[]{R.drawable.tick_green, R.drawable.tick_red, R.drawable.tick_orange};
     }
 
     public int getCount() {
@@ -45,9 +45,9 @@ public class ImageAdapter extends BaseAdapter {
         TextView textV;
         if (convertView == null) {
             // if it's not recycled, initialize some attributes
+            int scaledHeight = (int) mContext.getResources().getDisplayMetrics().density * 32;
             textV = new TextView(mContext);
-            textV.setLayoutParams(new GridView.LayoutParams(65, 65));
-
+            textV.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, scaledHeight));
 
             if (items[position] >= 0){
                 textV.setBackgroundResource(ticks[items[position]]);
@@ -58,9 +58,6 @@ public class ImageAdapter extends BaseAdapter {
                 textV.setTypeface(null, Typeface.BOLD);
                 textV.setGravity(Gravity.CENTER);
             }
-
-            //textV.setPadding(18, 18, 18, 18);
-
 
         } else {
             textV = (TextView) convertView;

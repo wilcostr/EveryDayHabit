@@ -123,8 +123,6 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabs = (TabLayout) findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
 
-        //TODO: Fix viewPager height
-
         //Initialise stats
         textViewSuccessRate = (TextView) findViewById(R.id.textViewSuccessRate);
         textViewCurrentStreak = (TextView) findViewById(R.id.textViewCurrentStreak);
