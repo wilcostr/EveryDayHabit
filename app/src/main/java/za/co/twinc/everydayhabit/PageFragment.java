@@ -69,12 +69,18 @@ public class PageFragment extends Fragment {
 
         // Load Shared Preferences of habit
         habitNum = habitNumFromIndex(getContext(), habitPosition);
-        String habitText = getStringFromPrefs(getContext(), HABIT_PREFS+habitNum,
-                "habit", "No Habit Set");
+        final String habitText = getStringFromPrefs(getContext(), HABIT_PREFS+habitNum,
+                "habit", getString(R.string.txt_habit));
 
         textViewHabit.setText(habitText);
 
-        displayHabitContent();
+        // Calculate offset to display past 49 days
+        int i = 0;
+        while (getIntFromPrefs(getContext(), HABIT_PREFS+habitNum, "log_entry_"+(48+i),-1) != -1)
+            i += 7;
+        final int offset = i;
+
+        displayHabitContent(offset);
 
         gridContent.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
@@ -83,6 +89,9 @@ public class PageFragment extends Fragment {
                 long timeDiff = System.currentTimeMillis() - timeStart;
                 long numDays =  TimeUnit.DAYS.convert(timeDiff,TimeUnit.MILLISECONDS);
 
+                // Subtract offset from numDays
+                numDays -= offset;
+
                 // Fix numDays if only starting tomorrow
                 if (timeDiff < 0)
                     numDays = -1;
@@ -90,7 +99,7 @@ public class PageFragment extends Fragment {
                 if (position == numDays) {
                     // Send intent to EditDayActivity
                     Intent editDay = new Intent(getContext(), EditDayActivity.class);
-                    editDay.putExtra("clicked_position", position);
+                    editDay.putExtra("clicked_position", position+offset);
                     editDay.putExtra("habit",getStringFromPrefs(getContext(),HABIT_PREFS+habitNum,
                             "habit",getString(R.string.edit_day_default)));
 
@@ -116,20 +125,25 @@ public class PageFragment extends Fragment {
         return view;
     }
 
-    public void displayHabitContent(){
+    public void displayHabitContent(int offset){
         int[] log_entries = new int[NUM_LOG_ENTRIES];
         SharedPreferences habit_log = getContext().getSharedPreferences(HABIT_PREFS+habitNum, 0);
 
         long timeDiff = System.currentTimeMillis() - habit_log.getLong("date", 1490000000000L);
         long numDays =  TimeUnit.DAYS.convert(timeDiff,TimeUnit.MILLISECONDS);
 
+        // Subtract offset from numDays
+        numDays -= offset;
+
+        // TODO: Add an offset to allow more than 49 days
+
         for (int i = 0; i < NUM_LOG_ENTRIES; i++) {
-            log_entries[i] = habit_log.getInt("log_entry_" + i, -1);
+            log_entries[i] = habit_log.getInt("log_entry_" + (i + offset), -1);
             if (log_entries[i] == -1 && i < numDays)
                 log_entries[i] = 1;             // Assume failure with no report
         }
 
         // Initialise gridContent with latest log_entries
-        gridContent.setAdapter(new ImageAdapter(getContext(), log_entries));
+        gridContent.setAdapter(new ImageAdapter(getContext(), log_entries, offset));
     }
 }

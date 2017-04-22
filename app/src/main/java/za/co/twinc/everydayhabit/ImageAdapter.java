@@ -11,7 +11,10 @@ import android.widget.TextView;
 
 import java.util.Locale;
 
+import static java.security.AccessController.getContext;
+import static za.co.twinc.everydayhabit.MainActivity.HABIT_PREFS;
 import static za.co.twinc.everydayhabit.MainActivity.NUM_LOG_ENTRIES;
+import static za.co.twinc.everydayhabit.MainActivity.getIntFromPrefs;
 
 /*
  * Created by wilco on 2016/11/03.
@@ -20,11 +23,13 @@ import static za.co.twinc.everydayhabit.MainActivity.NUM_LOG_ENTRIES;
 public class ImageAdapter extends BaseAdapter {
     private Context mContext;
     private int[] items;
+    private int offset;
     public final int[] ticks;
 
-    public ImageAdapter(Context c, int[] log_items) {
+    public ImageAdapter(Context c, int[] log_items, int habit_offset) {
         mContext = c;
         items = log_items;
+        offset = habit_offset;
         ticks = new int[]{R.drawable.tick_green, R.drawable.tick_red, R.drawable.tick_orange};
     }
 
@@ -45,15 +50,17 @@ public class ImageAdapter extends BaseAdapter {
         TextView textV;
         if (convertView == null) {
             // if it's not recycled, initialize some attributes
-            int scaledHeight = (int) mContext.getResources().getDisplayMetrics().density * 32;
+            int scaledSize = (int) mContext.getResources().getDisplayMetrics().density * 32;
             textV = new TextView(mContext);
-            textV.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, scaledHeight));
+            textV.setLayoutParams(new GridView.LayoutParams(scaledSize, scaledSize));
+
+            //TODO: Add offset here also
 
             if (items[position] >= 0){
                 textV.setBackgroundResource(ticks[items[position]]);
             }
             else{
-                textV.setText(String.format(Locale.UK, "%d", position + 1));
+                textV.setText(String.format(Locale.UK, "%d", position + 1 + offset));
                 textV.setTextSize(18);
                 textV.setTypeface(null, Typeface.BOLD);
                 textV.setGravity(Gravity.CENTER);

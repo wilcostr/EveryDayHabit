@@ -68,6 +68,15 @@
             android:name=".FirstUseActivity"
             android:label="@string/first_use_activity_title"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Congratulations"
+            android:label="@string/congratulations_activity_title"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="za.co.twinc.everydayhabit.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

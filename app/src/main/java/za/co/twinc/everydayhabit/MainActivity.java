@@ -174,23 +174,25 @@ public class MainActivity extends AppCompatActivity {
         long timeDiff = System.currentTimeMillis() - habit_log.getLong("date", 1490000000000L);
         long numDays =  TimeUnit.DAYS.convert(timeDiff,TimeUnit.MILLISECONDS);
 
+        // TODO: Loop over numDays to allow more than 49 entries
+
         streak_current = 0; streak_longest = 0;
         days_success = 0; days_fail = 0; days_fail_legit = 0;
-        for (int i = 0; i < NUM_LOG_ENTRIES; i++) {
-            int log_enty = habit_log.getInt("log_entry_" + i, -1);
+        for (int i = 0; i <= 100; i++) {
+            int log_entry = habit_log.getInt("log_entry_" + i, -1);
 
-            if (log_enty == -1 && i < numDays)
-                log_enty = 1;             // Assume failure with no report
+            if (log_entry == -1 && i < numDays)
+                log_entry = 1;             // Assume failure with no report
 
-            if (log_enty == 0) {          // Successful day
+            if (log_entry == 0) {          // Successful day
                 days_success ++;
                 streak_current ++;
             }
-            else if (log_enty == 1){      // Failure with no legit reason
+            else if (log_entry == 1){      // Failure with no legit reason
                 days_fail ++;
                 streak_current = 0;
             }
-            else if (log_enty == 2){      // Failure with legit reason
+            else if (log_entry == 2){      // Failure with legit reason
                 if (includeLegit){
                     days_success ++;
                     streak_current ++;
@@ -206,10 +208,21 @@ public class MainActivity extends AppCompatActivity {
         //Set stats
         int total_days = days_success+days_fail+days_fail_legit;
 
-        if (total_days == 0) textViewSuccessRate.setText("0%");
-        else textViewSuccessRate.setText(String.format(Locale.UK,"%.1f%%",((100.0*days_success)/total_days)));
-        textViewCurrentStreak.setText(String.format(Locale.UK,"%d",streak_current));
-        textViewLongestStreak.setText(String.format(Locale.UK,"%d",streak_longest));
+        String successRate = "0%";
+        String currentStreak = String.format(Locale.UK,"%d",streak_current);
+        String longestStreak = String.format(Locale.UK,"%d",streak_longest);
+        if (total_days > 0) successRate = String.format(Locale.UK,"%.1f%%",((100.0*days_success)/total_days));
+        textViewSuccessRate.setText(successRate);
+        textViewCurrentStreak.setText(currentStreak);
+        textViewLongestStreak.setText(longestStreak);
+
+        if (total_days==49 && habit_log.getBoolean("showCongrats",true)){
+            Intent intent = new Intent(this, Congratulations.class);
+            intent.putExtra("habitText", habit_log.getString("habit",getString(R.string.txt_habit)));
+            intent.putExtra("rate", successRate);
+            intent.putExtra("streak", longestStreak);
+            startActivity(intent);
+        }
     }
 
 
@@ -340,7 +353,7 @@ public class MainActivity extends AppCompatActivity {
 
         final SharedPreferences habit_log = getSharedPreferences(HABIT_PREFS+current_habit, 0);
 
-        final String habitText = habit_log.getString("habit","Habit");
+        final String habitText = habit_log.getString("habit",getString(R.string.txt_habit));
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Delete: " + habitText);

@@ -89,6 +89,14 @@
         keep the trigger and reward consistent, and do it every day!
     </string>
 
-
+    <string name="congratulations_activity_title">Congratulations!</string>
+    <string name="congratulations_text">
+        Well done on completing seven weeks of your habit to %1$s every day!\n
+        \nYou maintained a success rate of %2$s, and had a best running streak of %3$s.\n
+        \nWhile 49 straight days should be sufficient to establish your habit, you\'re welcome to
+        keep tracking your activity with EveryDayHabit. We\'ll shift your grid to display the most
+        recent seven weeks only, but your stats will still be based on your progress since day one.
+    </string>
+    <string name="congratulations_button">Got It</string>
 
 </resources>

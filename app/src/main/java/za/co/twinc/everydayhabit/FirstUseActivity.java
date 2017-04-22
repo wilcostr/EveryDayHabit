@@ -18,7 +18,7 @@ public class FirstUseActivity extends AppCompatActivity {
 
     }
 
-    public void onFirstUseButtonClick(View view){
+    public void onButtonFirstUseClick(View view){
         finish();
     }
 }
