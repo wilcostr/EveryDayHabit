@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="praise">
+        <item>Well done!</item>
+        <item>Awesome!</item>
+        <item>Keep going!</item>
+        <item>Great stuff!</item>
+        <item>Nice!</item>
+    </string-array>
+</resources>

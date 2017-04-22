@@ -114,9 +114,9 @@ public class PageFragment extends Fragment {
                     String reason = getStringFromPrefs(getContext(),HABIT_PREFS+habitNum,
                             "log_reason_" + position,
                             getString(R.string.txt_no_reason));
-                    //TODO: Add multiple praise randomised
+                    String praise = getPraise();
                     if (getIntFromPrefs(getContext(), HABIT_PREFS+habitNum,"log_entry_"+position,-1) == 0)
-                        reason = "Well done, keep it up!";
+                        reason = praise;
                     Toast.makeText(getContext(), reason, Toast.LENGTH_LONG).show();
                 }
             }
@@ -135,8 +135,6 @@ public class PageFragment extends Fragment {
         // Subtract offset from numDays
         numDays -= offset;
 
-        // TODO: Add an offset to allow more than 49 days
-
         for (int i = 0; i < NUM_LOG_ENTRIES; i++) {
             log_entries[i] = habit_log.getInt("log_entry_" + (i + offset), -1);
             if (log_entries[i] == -1 && i < numDays)
@@ -145,5 +143,12 @@ public class PageFragment extends Fragment {
 
         // Initialise gridContent with latest log_entries
         gridContent.setAdapter(new ImageAdapter(getContext(), log_entries, offset));
+    }
+
+    public String getPraise(){
+        String[] praise = getResources().getStringArray(R.array.praise);
+        return praise[(int)(Math.random()*praise.length)];
+//        switch (Math.random()*)
+//        getString(R.string.praise)Math.random()
     }
 }

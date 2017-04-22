@@ -174,11 +174,9 @@ public class MainActivity extends AppCompatActivity {
         long timeDiff = System.currentTimeMillis() - habit_log.getLong("date", 1490000000000L);
         long numDays =  TimeUnit.DAYS.convert(timeDiff,TimeUnit.MILLISECONDS);
 
-        // TODO: Loop over numDays to allow more than 49 entries
-
         streak_current = 0; streak_longest = 0;
         days_success = 0; days_fail = 0; days_fail_legit = 0;
-        for (int i = 0; i <= 100; i++) {
+        for (int i = 0; i <= numDays; i++) {
             int log_entry = habit_log.getInt("log_entry_" + i, -1);
 
             if (log_entry == -1 && i < numDays)
@@ -618,7 +616,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            textViewMotivation.setText(s.replace("(","\n- ").replace(")",""));
+            if (s != null)
+                textViewMotivation.setText(s.replace("(","\n- ").replace(")",""));
         }
     }
 
