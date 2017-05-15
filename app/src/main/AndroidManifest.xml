@@ -39,8 +39,7 @@
             android:name=".EditDayActivity"
             android:label="@string/edit_day_activity_title"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustResize">
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="za.co.twinc.everydayhabit.MainActivity" />

@@ -1,109 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/content_edit_day"
+    tools:context="za.co.twinc.everydayhabit.EditDayActivity"
+    tools:showIn="@layout/activity_edit_day"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="za.co.twinc.everydayhabit.EditDayActivity"
-    tools:showIn="@layout/activity_edit_day">
+    android:fillViewport="true"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <TextView
-        android:text="@string/edit_day_default"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/text_view_habit"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        style="@style/B18TextViewStyle"
-        android:textAlignment="textStart"
-        android:gravity="start"/>
-
-    <RadioGroup
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:checkedButton="@+id/radioButton_yes"
-        android:orientation="horizontal"
-        android:id="@+id/radio_edit_day"
-        android:layout_marginTop="17dp"
-        android:padding="10dp"
-        android:layout_below="@id/text_view_habit"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin">
 
-        <RadioButton
-            android:text="@string/edit_day_yes"
+        <TextView
+            android:text="@string/edit_day_default"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/radioButton_yes"
-            android:layout_weight="1" />
+            android:id="@+id/text_view_habit"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            style="@style/B18TextViewStyle"
+            android:textAlignment="textStart"
+            android:gravity="start"/>
 
-        <RadioButton
-            android:text="@string/edit_day_no"
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checkedButton="@+id/radioButton_yes"
+            android:orientation="horizontal"
+            android:id="@+id/radio_edit_day"
+            android:layout_marginTop="17dp"
+            android:padding="10dp"
+            android:layout_below="@id/text_view_habit"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true">
+
+            <RadioButton
+                android:text="@string/edit_day_yes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/radioButton_yes"
+                android:layout_weight="1" />
+
+            <RadioButton
+                android:text="@string/edit_day_no"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/radioButton_no"
+                android:layout_weight="1" />
+
+        </RadioGroup>
+
+
+        <TextView
+            android:text="@string/edit_day_why"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/radioButton_no"
-            android:layout_weight="1" />
+            android:id="@+id/textView2"
+            style="@style/B18TextViewStyle"
+            android:visibility="gone"
+            android:layout_marginTop="27dp"
+            android:layout_below="@id/radio_edit_day"/>
 
-    </RadioGroup>
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textCapSentences"
+            android:maxLength="2000"
+            android:ems="10"
+            android:layout_below="@id/textView2"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="26dp"
+            android:id="@+id/editText"
+            android:gravity="start"
+            android:background="#DDD"
+            android:selectAllOnFocus="false"
+            android:visibility="gone"
+            android:hint="@string/edit_day_reason"
+            android:padding="10dp" />
 
+        <CheckBox
+            android:text="@string/edit_day_legit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="34dp"
+            android:id="@+id/checkBox"
+            android:layout_below="@id/editText"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:textSize="16sp"
+            android:textAlignment="textStart"
+            android:gravity="start"
+            android:visibility="gone"/>
 
-    <TextView
-        android:text="@string/edit_day_why"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView2"
-        style="@style/B18TextViewStyle"
-        android:visibility="gone"
-        android:layout_marginTop="27dp"
-        android:layout_below="@id/radio_edit_day"/>
+        <Button
+            android:text="@string/edit_day_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:id="@+id/button_done"
+            android:visibility="visible"
+            android:layout_below="@id/checkBox" />
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textCapSentences"
-        android:maxLength="2000"
-        android:ems="10"
-        android:layout_below="@id/textView2"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="26dp"
-        android:id="@+id/editText"
-        android:gravity="start"
-        android:background="#DDD"
-        android:selectAllOnFocus="false"
-        android:visibility="gone"
-        android:hint="@string/edit_day_reason"
-        android:padding="10dp" />
-
-    <CheckBox
-        android:text="@string/edit_day_legit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="34dp"
-        android:id="@+id/checkBox"
-        android:layout_below="@id/editText"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:textSize="16sp"
-        android:textAlignment="textStart"
-        android:gravity="start"
-        android:visibility="gone"/>
-
-    <Button
-        android:text="@string/edit_day_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
-        android:id="@+id/button_done"
-        android:visibility="visible"
-        android:layout_below="@id/checkBox" />
-
-</RelativeLayout>
+    </RelativeLayout>
+</ScrollView>
