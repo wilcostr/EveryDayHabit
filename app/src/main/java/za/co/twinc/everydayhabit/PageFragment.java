@@ -83,6 +83,7 @@ public class PageFragment extends Fragment {
         displayHabitContent(offset);
 
         gridContent.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
                 long timeStart = getLongFromPrefs(getContext(),HABIT_PREFS+habitNum,"date", 1490000000000L);
@@ -117,8 +118,16 @@ public class PageFragment extends Fragment {
                     String praise = getPraise();
                     if (getIntFromPrefs(getContext(), HABIT_PREFS+habitNum,"log_entry_"+position,-1) == 0)
                         reason = praise;
-                    Toast.makeText(getContext(), reason, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), reason, Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+
+        gridContent.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Toast.makeText(getContext(), "long clicked", Toast.LENGTH_SHORT).show();
+                return true;
             }
         });
 

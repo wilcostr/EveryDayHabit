@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
         android:title="@string/preference_category_general"
         android:key="preference_category_general">
@@ -9,9 +10,9 @@
             android:title="@string/preference_notifications"
             android:key="switch_preference_notification" />
         <RingtonePreference
-            android:showDefault="true"
             android:key="ringtone_preference"
             android:ringtoneType="notification"
+            android:showDefault="true"
             android:title="@string/preference_notification_tone" />
         <SwitchPreference
             android:defaultValue="false"

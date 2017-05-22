@@ -98,6 +98,7 @@
         recent seven weeks only, but your stats will still be based on your progress since day one.
     </string>
     <string name="congratulations_button">Got It</string>
+    <string name="action_rate">Rate App</string>
 
 
 </resources>

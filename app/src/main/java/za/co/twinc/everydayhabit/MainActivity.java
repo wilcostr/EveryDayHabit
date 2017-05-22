@@ -265,6 +265,10 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_start:
                 Intent intent = new Intent(getApplicationContext(), FirstUseActivity.class);
                 startActivity(intent);
+                return true;
+            case R.id.action_rate:
+                //TODO: Rate this app.
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

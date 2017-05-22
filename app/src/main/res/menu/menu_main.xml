@@ -18,6 +18,10 @@
         android:id="@+id/action_start"
         android:orderInCategory="104"
         android:title="@string/action_startup_info"/>
+    <item
+        android:id="@+id/action_rate"
+        android:orderInCategory="105"
+        android:title="@string/action_rate" />
 
 
 </menu>
