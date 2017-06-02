@@ -13,6 +13,7 @@ import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
+import android.provider.Settings;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
@@ -129,11 +130,11 @@ public class SettingsActivity extends Activity {
             ((EditTextPreference)p).setText(intent.getStringExtra("habit_summary"));
 
             // Set notification tone
-            // TODO: Does this preference need to be disabled by default?
+            // TODO: Test default
             p = getPreferenceManager().findPreference(KEY_PREF_NOTIFICATION_TONE);
-            p.setDefaultValue("DEFAULT_NOTIFICATION_URI");
+            p.setDefaultValue(Settings.System.DEFAULT_NOTIFICATION_URI);
             String toneStr = getPreferenceManager().getSharedPreferences()
-                    .getString(KEY_PREF_NOTIFICATION_TONE, "DEFAULT_NOTIFICATION_URI");
+                    .getString(KEY_PREF_NOTIFICATION_TONE, Settings.System.DEFAULT_NOTIFICATION_URI.toString());
             Ringtone tone = RingtoneManager.getRingtone(getActivity(), Uri.parse(toneStr));
             p.setSummary(tone.getTitle(getActivity()));
             if (p.getSummary().equals("Unknown ringtone")) p.setSummary("None");

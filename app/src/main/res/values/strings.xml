@@ -58,6 +58,7 @@
     <string name="txt_new_habit">New Habit</string>
     <string name="txt_add_new_habit">Add New Habit</string>
     <string name="txt_no_reason">You didn\'t log a reason</string>
+    <string name="txt_no_log">No progress logged</string>
 
     <string name="first_use_activity_title">EveryDayHabit</string>
     <string name="first_use_button">Let\'s Get Started</string>

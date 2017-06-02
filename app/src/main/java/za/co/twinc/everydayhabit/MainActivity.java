@@ -47,9 +47,10 @@ public class MainActivity extends AppCompatActivity {
     public static final String HABIT_PREFS = "habit_prefs_";
     public static final int NUM_LOG_ENTRIES = 49;
 
-    public static final int EDIT_DAY_REQUEST    = 1;
-    public static final int NEW_HABIT_REQUEST   = 2;
-    static final int        SETTINGS_REQUEST    = 3;
+    public static final int EDIT_DAY_REQUEST        = 1;
+    public static final int NEW_HABIT_REQUEST       = 2;
+    static final int        SETTINGS_REQUEST        = 3;
+    static final int        CONGRATULATE_REQUEST    = 4;
 
     int streak_longest, streak_current, days_fail, days_fail_legit, days_success;
     int current_habit;
@@ -166,6 +167,7 @@ public class MainActivity extends AppCompatActivity {
         if (current_habit==-1) return;
 
         SharedPreferences habit_log = getSharedPreferences(HABIT_PREFS+current_habit, 0);
+        SharedPreferences.Editor habit_editor = habit_log.edit();
 
         // Include/Exclude legit excuses based on settings
         SharedPreferences settingsPref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -177,11 +179,13 @@ public class MainActivity extends AppCompatActivity {
         streak_current = 0; streak_longest = 0;
         days_success = 0; days_fail = 0; days_fail_legit = 0;
         for (int i = 0; i <= numDays; i++) {
-            int log_entry = habit_log.getInt("log_entry_" + i, -1);
+            int log_entry = habit_log.getInt("log_entry_"+i, -1);
 
-            if (log_entry == -1 && i < numDays)
+            if (log_entry == -1 && i < numDays) {
                 log_entry = 1;             // Assume failure with no report
-
+                habit_editor.putString("log_reason_"+i, getString(R.string.txt_no_log));
+                habit_editor.putInt("log_entry_"+i, 1);
+            }
             if (log_entry == 0) {          // Successful day
                 days_success ++;
                 streak_current ++;
@@ -202,6 +206,7 @@ public class MainActivity extends AppCompatActivity {
             }
             if (streak_current > streak_longest) streak_longest = streak_current;
         }
+        habit_editor.apply();
 
         //Set stats
         int total_days = days_success+days_fail+days_fail_legit;
@@ -214,12 +219,12 @@ public class MainActivity extends AppCompatActivity {
         textViewCurrentStreak.setText(currentStreak);
         textViewLongestStreak.setText(longestStreak);
 
-        if (total_days==49 && habit_log.getBoolean("showCongrats",true)){
+        if (total_days==NUM_LOG_ENTRIES && habit_log.getBoolean("showCongrats",true)){
             Intent intent = new Intent(this, Congratulations.class);
             intent.putExtra("habitText", habit_log.getString("habit",getString(R.string.txt_habit)));
             intent.putExtra("rate", successRate);
             intent.putExtra("streak", longestStreak);
-            startActivity(intent);
+            startActivityForResult(intent,CONGRATULATE_REQUEST);
         }
     }
 
@@ -529,6 +534,13 @@ public class MainActivity extends AppCompatActivity {
                 setHabitNotification(next_habit);
                 // Activate boot receiver if this is the first habit added
                 if (num_habits==0) alarmReceiver.setBootReceiver(getApplicationContext());
+            }
+            else if (requestCode == CONGRATULATE_REQUEST){
+                // Update habit_log to not show congratulations message again
+                SharedPreferences habit_log = getSharedPreferences(HABIT_PREFS+current_habit, 0);
+                SharedPreferences.Editor habit_editor = habit_log.edit();
+                habit_editor.putBoolean("showCongrats", false);
+                habit_editor.apply();
             }
         }
     }

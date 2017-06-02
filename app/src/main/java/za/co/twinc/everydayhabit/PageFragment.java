@@ -108,15 +108,15 @@ public class PageFragment extends Fragment {
                 }
                 else if (position == numDays+1) {
                     // Clicked on tomorrow
-                    Toast.makeText(getContext(), "Cannot edit tomorrow's entry", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), "Cannot edit tomorrow's entry", Toast.LENGTH_SHORT).show();
                 }
                 else if (position < numDays) {
                     // Clicked on an old entry
                     String reason = getStringFromPrefs(getContext(),HABIT_PREFS+habitNum,
-                            "log_reason_" + position,
+                            "log_reason_" + (position+offset),
                             getString(R.string.txt_no_reason));
                     String praise = getPraise();
-                    if (getIntFromPrefs(getContext(), HABIT_PREFS+habitNum,"log_entry_"+position,-1) == 0)
+                    if (getIntFromPrefs(getContext(), HABIT_PREFS+habitNum,"log_entry_"+(position+offset),-1) == 0)
                         reason = praise;
                     Toast.makeText(getContext(), reason, Toast.LENGTH_SHORT).show();
                 }
