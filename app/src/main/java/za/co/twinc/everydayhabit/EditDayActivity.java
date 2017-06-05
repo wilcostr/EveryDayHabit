@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -37,10 +38,11 @@ public class EditDayActivity extends AppCompatActivity {
                 requestIntent.getStringExtra("habit").toLowerCase() +
                 getString(R.string.edit_day_today));
 
-        //These start off invisible
+        // These start off invisible
         final TextView textView2 = (TextView) findViewById(R.id.textView2);
-        final EditText editText = (EditText) findViewById(R.id.editText);
         final CheckBox checkBox = (CheckBox) findViewById(R.id.checkBox);
+
+        final EditText editText = (EditText) findViewById(R.id.editText);
         final Button button_done = (Button) findViewById(R.id.button_done);
 
         final RadioGroup radioGroup = (RadioGroup) findViewById(R.id.radio_edit_day);
@@ -49,26 +51,28 @@ public class EditDayActivity extends AppCompatActivity {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 // checkedId is the RadioButton selected
                 if (checkedId == R.id.radioButton_yes ){
-                    textView2.setVisibility(View.GONE);
-                    editText.setVisibility(View.GONE);
+                    textView2.setText(getString(R.string.edit_day_comments));
                     checkBox.setVisibility(View.GONE);
+                    editText.setHint(getString(R.string.edit_day_log_comment));
                 }
                 else{
-                    textView2.setVisibility(View.VISIBLE);
-                    editText.setVisibility(View.VISIBLE);
+                    textView2.setText(getString(R.string.edit_day_why));
                     checkBox.setVisibility(View.VISIBLE);
+                    editText.setHint(getString(R.string.edit_day_reason));
                 }
             }
         });
         button_done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Check if anything is to be added to the log
+                String reason = String.valueOf(editText.getText());
+                if (reason.length()>0) requestIntent.putExtra("reason", reason);
+
                 if (radioGroup.getCheckedRadioButtonId() == R.id.radioButton_yes){
                     processClick(0);
                 }
                 else {
-                    String reason = String.valueOf(editText.getText());
-                    if (reason.length()>0) requestIntent.putExtra("reason", reason);
                     boolean legit = checkBox.isChecked();
                     if (legit) processClick(2);
                     else processClick(1);
@@ -87,6 +91,8 @@ public class EditDayActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 
     public void processClick(int state) {

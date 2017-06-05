@@ -86,19 +86,12 @@ public class PageFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                long timeStart = getLongFromPrefs(getContext(),HABIT_PREFS+habitNum,"date", 1490000000000L);
-                long timeDiff = System.currentTimeMillis() - timeStart;
-                long numDays =  TimeUnit.DAYS.convert(timeDiff,TimeUnit.MILLISECONDS);
 
-                // Subtract offset from numDays
-                numDays -= offset;
+                int numDays = getNumDays(offset);
 
-                // Fix numDays if only starting tomorrow
-                if (timeDiff < 0)
-                    numDays = -1;
-
-                if (position == numDays) {
-                    // Send intent to EditDayActivity
+                if ( (position == numDays) &&
+                        (getIntFromPrefs(getContext(),HABIT_PREFS+habitNum,"log_entry_"+(position+offset),-1) == -1) ) {
+                    // Log progress for today: Send intent to EditDayActivity
                     Intent editDay = new Intent(getContext(), EditDayActivity.class);
                     editDay.putExtra("clicked_position", position+offset);
                     editDay.putExtra("habit",getStringFromPrefs(getContext(),HABIT_PREFS+habitNum,
@@ -110,14 +103,14 @@ public class PageFragment extends Fragment {
                     // Clicked on tomorrow
                     Toast.makeText(getContext(), "Cannot edit tomorrow's entry", Toast.LENGTH_SHORT).show();
                 }
-                else if (position < numDays) {
+                else if (position <= numDays) {
                     // Clicked on an old entry
                     String reason = getStringFromPrefs(getContext(),HABIT_PREFS+habitNum,
                             "log_reason_" + (position+offset),
                             getString(R.string.txt_no_reason));
-                    String praise = getPraise();
-                    if (getIntFromPrefs(getContext(), HABIT_PREFS+habitNum,"log_entry_"+(position+offset),-1) == 0)
-                        reason = praise;
+                    if ( (getIntFromPrefs(getContext(), HABIT_PREFS+habitNum,"log_entry_"+(position+offset),-1) == 0) &&
+                            (reason == getString(R.string.txt_no_reason)) )
+                        reason = getPraise();
                     Toast.makeText(getContext(), reason, Toast.LENGTH_SHORT).show();
                 }
             }
@@ -125,13 +118,35 @@ public class PageFragment extends Fragment {
 
         gridContent.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
             @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(getContext(), "long clicked", Toast.LENGTH_SHORT).show();
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
+                int numDays = getNumDays(offset);
+                if (position <= numDays) {
+                    // Send intent to EditDayActivity
+                    Intent editDay = new Intent(getContext(), EditDayActivity.class);
+                    editDay.putExtra("clicked_position", position+offset);
+                    editDay.putExtra("habit",getStringFromPrefs(getContext(),HABIT_PREFS+habitNum,
+                            "habit",getString(R.string.edit_day_default)));
+
+                    getActivity().startActivityForResult(editDay, EDIT_DAY_REQUEST);
+                }
                 return true;
             }
         });
-
         return view;
+    }
+
+    public int getNumDays(int offset) {
+        long timeStart = getLongFromPrefs(getContext(),HABIT_PREFS+habitNum,"date", 1490000000000L);
+        long timeDiff = System.currentTimeMillis() - timeStart;
+        long numDays =  TimeUnit.DAYS.convert(timeDiff,TimeUnit.MILLISECONDS);
+
+        // Subtract offset from numDays
+        numDays -= offset;
+
+        // Fix numDays if only starting tomorrow
+        if (timeDiff < 0)
+            numDays = -1;
+        return (int)numDays;
     }
 
     public void displayHabitContent(int offset){

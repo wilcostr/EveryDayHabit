@@ -15,7 +15,9 @@
     <string name="edit_day_yes">Yes</string>
     <string name="edit_day_no">No</string>
     <string name="edit_day_why">Why were you unsuccessful?</string>
+    <string name="edit_day_comments">Comments:</string>
     <string name="edit_day_reason">Log your reason</string>
+    <string name="edit_day_log_comment">Log your comments</string>
     <string name="edit_day_legit">My reason is actually legit</string>
     <string name="edit_day_button">Done</string>
 

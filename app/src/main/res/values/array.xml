@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="praise">
-        <item>Well done!</item>
-        <item>Awesome!</item>
-        <item>Keep going!</item>
-        <item>Great stuff!</item>
-        <item>Nice!</item>
+        <item>Well done</item>
+        <item>Awesome</item>
+        <item>Keep going</item>
+        <item>Great stuff</item>
+        <item>Excellent</item>
+        <item>Successful day</item>
+        <item>Marvelous</item>
     </string-array>
 </resources>

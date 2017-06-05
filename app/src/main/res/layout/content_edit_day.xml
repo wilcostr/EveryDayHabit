@@ -62,12 +62,11 @@
 
 
         <TextView
-            android:text="@string/edit_day_why"
+            android:text="@string/edit_day_comments"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/textView2"
             style="@style/B18TextViewStyle"
-            android:visibility="gone"
             android:layout_marginTop="27dp"
             android:layout_below="@id/radio_edit_day"/>
 
@@ -84,8 +83,7 @@
             android:gravity="start"
             android:background="#DDD"
             android:selectAllOnFocus="false"
-            android:visibility="gone"
-            android:hint="@string/edit_day_reason"
+            android:hint="@string/edit_day_log_comment"
             android:padding="10dp" />
 
         <CheckBox
