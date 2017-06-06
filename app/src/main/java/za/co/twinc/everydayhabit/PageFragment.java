@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 import static za.co.twinc.everydayhabit.MainActivity.EDIT_DAY_REQUEST;
@@ -76,7 +78,7 @@ public class PageFragment extends Fragment {
 
         // Calculate offset to display past 49 days
         int i = 0;
-        while (getIntFromPrefs(getContext(), HABIT_PREFS+habitNum, "log_entry_"+(48+i),-1) != -1)
+        while (getIntFromPrefs(getContext(), HABIT_PREFS+habitNum, "log_entry_"+(NUM_LOG_ENTRIES-1+i),-1) != -1)
             i += 7;
         final int offset = i;
 
@@ -106,7 +108,7 @@ public class PageFragment extends Fragment {
                 else if (position <= numDays) {
                     // Clicked on an old entry
                     String reason = getStringFromPrefs(getContext(),HABIT_PREFS+habitNum,
-                            "log_reason_" + (position+offset),
+                            "log_reason_"+(position+offset),
                             getString(R.string.txt_no_reason));
                     if ( (getIntFromPrefs(getContext(), HABIT_PREFS+habitNum,"log_entry_"+(position+offset),-1) == 0) &&
                             (reason == getString(R.string.txt_no_reason)) )
@@ -126,6 +128,22 @@ public class PageFragment extends Fragment {
                     editDay.putExtra("clicked_position", position+offset);
                     editDay.putExtra("habit",getStringFromPrefs(getContext(),HABIT_PREFS+habitNum,
                             "habit",getString(R.string.edit_day_default)));
+                    editDay.putExtra("entry",getIntFromPrefs(getContext(),HABIT_PREFS+habitNum,
+                            "log_entry_"+(position+offset),-1));
+                    editDay.putExtra("comment",getStringFromPrefs(getContext(),HABIT_PREFS+habitNum,
+                            "log_reason_"+(position+offset),""));
+
+                    String dayString = getString(R.string.edit_day_today);
+                    if (position == numDays-1)
+                        dayString = getString(R.string.edit_day_yesterday);
+                    else if (position < numDays-1){
+                        long dayLong = getLongFromPrefs(getContext(), HABIT_PREFS+habitNum, "date", 1490000000000L);
+                        dayLong += (long)24*60*60*1000*(position+offset);
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(dayLong);
+                        dayString = getString(R.string.edit_day_on) + DateFormat.getDateFormat(getContext()).format(calendar.getTime()) + "?";
+                    }
+                    editDay.putExtra("day_string",dayString);
 
                     getActivity().startActivityForResult(editDay, EDIT_DAY_REQUEST);
                 }
@@ -136,7 +154,7 @@ public class PageFragment extends Fragment {
     }
 
     public int getNumDays(int offset) {
-        long timeStart = getLongFromPrefs(getContext(),HABIT_PREFS+habitNum,"date", 1490000000000L);
+        long timeStart = getLongFromPrefs(getContext(), HABIT_PREFS+habitNum, "date", 1490000000000L);
         long timeDiff = System.currentTimeMillis() - timeStart;
         long numDays =  TimeUnit.DAYS.convert(timeDiff,TimeUnit.MILLISECONDS);
 
