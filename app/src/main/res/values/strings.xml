@@ -53,6 +53,11 @@
     <string name="preference_excuses_summary_on">Legitimate excuses will not break streaks</string>
     <string name="preference_excuses_summary_off">Legitimate excuses are considered missed days
         and will break streaks</string>
+    <string name="preference_about">"EveryDayHabit Version"</string>
+    <string name="preference_description">"Description"</string>
+    <string name="preference_summary">"Summary"</string>
+    <string name="preference_notification_time">"Notification Time"</string>
+    <string name="preference_start_date">"Habit Start Date"</string>
 
     <string name="default_habit_text">Default Habit Text</string>
     <string name="default_habit_word">Habit</string>

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -12,6 +13,7 @@ import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
 import android.provider.Settings;
 import android.support.v7.widget.Toolbar;
@@ -34,6 +36,7 @@ public class SettingsActivity extends Activity {
     public static final String KEY_PREF_NOTIFICATION_SWITCH =   "switch_preference_notification";
     public static final String KEY_PREF_LEGIT_SWITCH =          "switch_preference_legit";
     public static final String KEY_PREF_NOTIFICATION_TONE =     "ringtone_preference";
+    public static final String KEY_PREF_ABOUT =                 "simple_text_about";
 
     public static final String KEY_PREF_DATE = "simple_text_habit_date";
 
@@ -114,26 +117,37 @@ public class SettingsActivity extends Activity {
             addPreferencesFromResource(R.xml.preferences);
 
             Preference p;
+            PreferenceManager preferenceManager = getPreferenceManager();
             // Set habit text
-            p = getPreferenceManager().findPreference(KEY_PREF_HABIT_DESCRIPTION);
+            p = preferenceManager.findPreference(KEY_PREF_HABIT_DESCRIPTION);
             p.setSummary(intent.getStringExtra("habit_text"));
             ((EditTextPreference)p).setText(intent.getStringExtra("habit_text"));
 
             // Set habit summary
-            p = getPreferenceManager().findPreference(KEY_PREF_HABIT_SUMMARY);
+            p = preferenceManager.findPreference(KEY_PREF_HABIT_SUMMARY);
             p.setSummary(intent.getStringExtra("habit_summary"));
             ((EditTextPreference)p).setText(intent.getStringExtra("habit_summary"));
 
             // Set habit notification time
-            p = getPreferenceManager().findPreference(KEY_PREF_HABIT_SUMMARY);
+            p = preferenceManager.findPreference(KEY_PREF_HABIT_SUMMARY);
             p.setSummary(intent.getStringExtra("habit_summary"));
             ((EditTextPreference)p).setText(intent.getStringExtra("habit_summary"));
 
+            // Set about string
+            p = preferenceManager.findPreference(KEY_PREF_ABOUT);
+            String versionName = "0";
+            try {
+                versionName = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0).versionName;
+            }catch (PackageManager.NameNotFoundException e){
+                versionName = "Not Found";
+            }
+            p.setSummary(versionName);
+
             // Set notification tone
             // TODO: Test default
-            p = getPreferenceManager().findPreference(KEY_PREF_NOTIFICATION_TONE);
+            p = preferenceManager.findPreference(KEY_PREF_NOTIFICATION_TONE);
             p.setDefaultValue(Settings.System.DEFAULT_NOTIFICATION_URI);
-            String toneStr = getPreferenceManager().getSharedPreferences()
+            String toneStr = preferenceManager.getSharedPreferences()
                     .getString(KEY_PREF_NOTIFICATION_TONE, Settings.System.DEFAULT_NOTIFICATION_URI.toString());
             Ringtone tone = RingtoneManager.getRingtone(getActivity(), Uri.parse(toneStr));
             p.setSummary(tone.getTitle(getActivity()));
@@ -150,7 +164,7 @@ public class SettingsActivity extends Activity {
             });
 
             // Set habit start date
-            p = getPreferenceManager().findPreference(KEY_PREF_DATE);
+            p = preferenceManager.findPreference(KEY_PREF_DATE);
             p.setSummary(intent.getStringExtra("habit_date"));
 
 

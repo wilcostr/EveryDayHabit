@@ -24,8 +24,8 @@
             android:key="simple_text_about"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:title="About"
-            android:summary="EveryDayHabit Version 0.0.0"/>
+            android:title="@string/preference_about"
+            android:summary="0"/>
 
     </PreferenceCategory>
 
@@ -37,7 +37,7 @@
             android:defaultValue="@string/default_habit_text"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:title="Description"
+            android:title="@string/preference_description"
             android:key="edit_text_preference_habit_text"
             android:summary="@string/default_habit_text" />
 
@@ -45,20 +45,20 @@
             android:defaultValue="@string/default_habit_word"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:title="Summary"
+            android:title="@string/preference_summary"
             android:key="edit_text_preference_habit_summary"
             android:summary="@string/default_habit_word" />
 
         <Preference
             android:key="time_picker_preference_notification"
-            android:summary="Summary"
-            android:title="Notification Time" />
+            android:summary="18:00"
+            android:title="@string/preference_notification_time" />
 
         <Preference
             android:key="simple_text_habit_date"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:title="Habit Start Date"
+            android:title="@string/preference_start_date"
             android:summary="NaN"/>
 
     </PreferenceCategory>
