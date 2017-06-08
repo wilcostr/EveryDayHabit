@@ -105,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Display First Use Info if no habits created
         if (getIntFromPrefs(MAIN_PREFS,"num_habits",0) == 0){
+            current_habit = -1;
             Intent intent = new Intent(getApplicationContext(), FirstUseActivity.class);
             startActivity(intent);
         }
@@ -520,6 +521,9 @@ public class MainActivity extends AppCompatActivity {
                 habit_editor.putLong("date", cal.getTimeInMillis());
 
                 habit_editor.apply();
+
+                // Show new habit
+                current_habit = next_habit;
 
                 // Update main_log habit counts
                 main_editor.putInt("num_habits", num_habits+1);

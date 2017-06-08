@@ -146,13 +146,18 @@ public class SettingsActivity extends Activity {
             // Set notification tone
             // TODO: Test default
             p = preferenceManager.findPreference(KEY_PREF_NOTIFICATION_TONE);
-            p.setDefaultValue(Settings.System.DEFAULT_NOTIFICATION_URI);
-            String toneStr = preferenceManager.getSharedPreferences()
+            //p.setDefaultValue(Settings.System.DEFAULT_NOTIFICATION_URI.toString());
+            String toneStr = preferenceManager.getDefaultSharedPreferences(getActivity())
                     .getString(KEY_PREF_NOTIFICATION_TONE, Settings.System.DEFAULT_NOTIFICATION_URI.toString());
+            if ( toneStr.equals(Settings.System.DEFAULT_NOTIFICATION_URI.toString()) ) {
+                preferenceManager.getDefaultSharedPreferences(getActivity()).edit()
+                        .putString(KEY_PREF_NOTIFICATION_TONE, Settings.System.DEFAULT_NOTIFICATION_URI.toString())
+                        .apply();
+            }
             Ringtone tone = RingtoneManager.getRingtone(getActivity(), Uri.parse(toneStr));
             p.setSummary(tone.getTitle(getActivity()));
             if (p.getSummary().equals("Unknown ringtone")) p.setSummary("None");
-
+            // Update summary on change of notification tone
             p.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object o) {

@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
@@ -63,14 +64,16 @@ public class AlarmReceiver extends BroadcastReceiver
                 PendingIntent.FLAG_ONE_SHOT);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String ringtonePreference = prefs.getString(SettingsActivity.KEY_PREF_NOTIFICATION_TONE, "DEFAULT_NOTIFICATION_URI");
+        String ringtonePreference = prefs.getString(SettingsActivity.KEY_PREF_NOTIFICATION_TONE,
+                Settings.System.DEFAULT_NOTIFICATION_URI.toString());
         Uri ringtoneUri = Uri.parse(ringtonePreference);
 
         // Create notification builder
+        // TODO: Use string resources
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.mipmap.ic_launcher_edh)
-                .setContentTitle("Did you " + intent.getStringExtra("habit_text").toLowerCase() + " today?")
-                //.setContentText("Hello World!")
+                //.setContentTitle("Did you " + intent.getStringExtra("habit_text").toLowerCase() + " today?")
+                .setContentText("Did you " + intent.getStringExtra("habit_text").toLowerCase() + " today?")
                 .setContentIntent(openMainPendingIntent)
                 .setAutoCancel(true)
                 .setCategory(CATEGORY_REMINDER)
