@@ -23,7 +23,7 @@ import static za.co.twinc.everydayhabit.MainActivity.MAIN_PREFS;
 import static za.co.twinc.everydayhabit.MainActivity.NEW_HABIT_REQUEST;
 import static za.co.twinc.everydayhabit.MainActivity.NUM_LOG_ENTRIES;
 import static za.co.twinc.everydayhabit.MainActivity.getIntFromPrefs;
-import static za.co.twinc.everydayhabit.MainActivity.getLongFromPrefs;
+import static za.co.twinc.everydayhabit.MainActivity.getDateFromPrefs;
 import static za.co.twinc.everydayhabit.MainActivity.getStringFromPrefs;
 import static za.co.twinc.everydayhabit.MainActivity.habitNumFromIndex;
 
@@ -35,7 +35,6 @@ import static za.co.twinc.everydayhabit.MainActivity.habitNumFromIndex;
 // Class containing Fragments for swiping through
 public class PageFragment extends Fragment {
     // TextView in a Fragment to display full habit text
-    TextView textViewHabit;
     private GridView gridContent;
     private int habitNum;
 
@@ -46,7 +45,7 @@ public class PageFragment extends Fragment {
         View view = inflater.inflate(R.layout.content_page_fragment, container, false);
         Bundle bundle = getArguments();
 
-        textViewHabit = (TextView) view.findViewById(R.id.textView_swipe);
+        TextView textViewHabit = (TextView) view.findViewById(R.id.textView_swipe);
         gridContent = (GridView) view.findViewById(R.id.content_grid);
 
         int habitPosition = bundle.getInt("num");
@@ -111,7 +110,7 @@ public class PageFragment extends Fragment {
                             "log_reason_"+(position+offset),
                             getString(R.string.txt_no_reason));
                     if ( (getIntFromPrefs(getContext(), HABIT_PREFS+habitNum,"log_entry_"+(position+offset),-1) == 0) &&
-                            (reason == getString(R.string.txt_no_reason)) )
+                            (reason.equals(getString(R.string.txt_no_reason))) )
                         reason = getPraise();
                     Toast.makeText(getContext(), reason, Toast.LENGTH_SHORT).show();
                 }
@@ -137,7 +136,7 @@ public class PageFragment extends Fragment {
                     if (position == numDays-1)
                         dayString = getString(R.string.edit_day_yesterday);
                     else if (position < numDays-1){
-                        long dayLong = getLongFromPrefs(getContext(), HABIT_PREFS+habitNum, "date", 1490000000000L);
+                        long dayLong = getDateFromPrefs(getContext(), HABIT_PREFS+habitNum);
                         dayLong += (long)24*60*60*1000*(position+offset);
                         Calendar calendar = Calendar.getInstance();
                         calendar.setTimeInMillis(dayLong);
@@ -153,8 +152,8 @@ public class PageFragment extends Fragment {
         return view;
     }
 
-    public int getNumDays(int offset) {
-        long timeStart = getLongFromPrefs(getContext(), HABIT_PREFS+habitNum, "date", 1490000000000L);
+    private int getNumDays(int offset) {
+        long timeStart = getDateFromPrefs(getContext(), HABIT_PREFS+habitNum);
         long timeDiff = System.currentTimeMillis() - timeStart;
         long numDays =  TimeUnit.DAYS.convert(timeDiff,TimeUnit.MILLISECONDS);
 
@@ -167,7 +166,7 @@ public class PageFragment extends Fragment {
         return (int)numDays;
     }
 
-    public void displayHabitContent(int offset){
+    private void displayHabitContent(int offset){
         int[] log_entries = new int[NUM_LOG_ENTRIES];
         SharedPreferences habit_log = getContext().getSharedPreferences(HABIT_PREFS+habitNum, 0);
 
@@ -187,10 +186,8 @@ public class PageFragment extends Fragment {
         gridContent.setAdapter(new ImageAdapter(getContext(), log_entries, offset));
     }
 
-    public String getPraise(){
+    private String getPraise(){
         String[] praise = getResources().getStringArray(R.array.praise);
         return praise[(int)(Math.random()*praise.length)];
-//        switch (Math.random()*)
-//        getString(R.string.praise)Math.random()
     }
 }

@@ -19,8 +19,7 @@ import android.widget.TextView;
 
 public class EditDayActivity extends AppCompatActivity {
 
-    Intent requestIntent;
-    TextView textViewHabit;
+    private Intent requestIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +33,7 @@ public class EditDayActivity extends AppCompatActivity {
         // Get intent data
         requestIntent = getIntent();
 
-        textViewHabit = (TextView)findViewById(R.id.text_view_habit);
+        TextView textViewHabit = (TextView)findViewById(R.id.text_view_habit);
         String dayString = requestIntent.getStringExtra("day_string");
         if (dayString == null)
             dayString = getString(R.string.edit_day_today);
@@ -97,7 +96,6 @@ public class EditDayActivity extends AppCompatActivity {
             }
         });
 
-        //TODO: What does this do??
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
@@ -113,7 +111,7 @@ public class EditDayActivity extends AppCompatActivity {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 
-    public void processClick(int state) {
+    private void processClick(int state) {
         requestIntent.putExtra("state", state);
         setResult(Activity.RESULT_OK, requestIntent);
         finish();

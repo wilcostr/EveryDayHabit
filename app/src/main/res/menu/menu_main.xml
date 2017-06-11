@@ -1,5 +1,4 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="za.co.twinc.everydayhabit.MainActivity">
     <item
@@ -22,6 +21,4 @@
         android:id="@+id/action_rate"
         android:orderInCategory="105"
         android:title="@string/action_rate" />
-
-
 </menu>

@@ -64,6 +64,7 @@
 
         <ImageButton
             android:id="@+id/button_next_motivation"
+            android:contentDescription="@string/motivation_next"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:src="@drawable/button_next"
@@ -79,7 +80,7 @@
 
         <TextView
             android:id="@+id/textView_motivation"
-            android:text="The problems we face either break us, or make us."
+            android:text="@string/motivation_default"
             style="@style/B18TextViewStyle"
             android:gravity="center_vertical"
             android:layout_width="0dp"
@@ -93,7 +94,6 @@
             android:layout_marginLeft="16dp"
             app:layout_constraintRight_toLeftOf="@+id/button_next_motivation"
             android:layout_marginTop="16dp" />
-
 
         <View
             android:layout_width="0dp"
@@ -109,7 +109,6 @@
             android:layout_marginTop="16dp"
             android:id="@+id/view" />
 
-
         <GridLayout
             android:id="@+id/stats_grid"
             android:layout_width="0dp"
@@ -122,39 +121,32 @@
             android:layout_marginTop="32dp">
 
             <TextView
-                android:text="Success Rate: "
+                android:text="@string/txt_success_rate"
                 style="@style/B18TextViewStyle"
-                android:layout_columnWeight="1"
                 android:layout_margin="2dp"/>
             <TextView
                 android:id="@+id/textViewSuccessRate"
                 style="@style/B18TextViewStyle"
-                android:text="0%"
-                android:layout_columnWeight="5"
+                android:text="@string/txt_0_percent"
                 android:layout_margin="2dp"/>
             <TextView
-                android:text="Current Streak: "
+                android:text="@string/txt_current_streak"
                 style="@style/B18TextViewStyle"
-                android:layout_columnWeight="1"
                 android:layout_margin="2dp"/>
             <TextView
                 android:id="@+id/textViewCurrentStreak"
                 style="@style/B18TextViewStyle"
-                android:text="0"
-                android:layout_columnWeight="5"
+                android:text="@string/txt_0"
                 android:layout_margin="2dp"/>
             <TextView
-                android:text="Longest Streak: "
+                android:text="@string/txt_longest_streak"
                 style="@style/B18TextViewStyle"
-                android:layout_columnWeight="1"
                 android:layout_margin="2dp"/>
             <TextView
                 android:id="@+id/textViewLongestStreak"
                 style="@style/B18TextViewStyle"
-                android:text="0"
-                android:layout_columnWeight="5"
+                android:text="@string/txt_0"
                 android:layout_margin="2dp"/>
-
         </GridLayout>
 
         <View

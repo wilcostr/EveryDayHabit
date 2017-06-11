@@ -23,5 +23,4 @@
 
     <include layout="@layout/content_new_habit" />
 
-
 </android.support.design.widget.CoordinatorLayout>

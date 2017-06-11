@@ -22,7 +22,6 @@ import android.support.v7.widget.Toolbar;
 
 public class NewHabitActivity extends AppCompatActivity {
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,7 +68,6 @@ public class NewHabitActivity extends AppCompatActivity {
         newFragment.show(getSupportFragmentManager(), "timePicker");
     }
 
-
     public static class TimePickerFragment extends DialogFragment
             implements TimePickerDialog.OnTimeSetListener {
 
@@ -102,7 +100,5 @@ public class NewHabitActivity extends AppCompatActivity {
             getActivity().setResult(Activity.RESULT_OK, requestIntent);
             getActivity().finish();
         }
-
     }
-
 }

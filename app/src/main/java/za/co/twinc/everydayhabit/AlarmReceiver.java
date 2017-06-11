@@ -38,8 +38,8 @@ public class AlarmReceiver extends BroadcastReceiver
     {
         int habitNum = intent.getIntExtra("habit_number",-1);
 
-        long timeStart = MainActivity.getLongFromPrefs(context, MainActivity.HABIT_PREFS+habitNum,
-                "date", 1490000000000L);
+        long timeStart = MainActivity.getDateFromPrefs(context, MainActivity.HABIT_PREFS+habitNum
+        );
         long timeDiff = System.currentTimeMillis() - timeStart;
         long numDays =  TimeUnit.DAYS.convert(timeDiff,TimeUnit.MILLISECONDS);
 
@@ -69,11 +69,10 @@ public class AlarmReceiver extends BroadcastReceiver
         Uri ringtoneUri = Uri.parse(ringtonePreference);
 
         // Create notification builder
-        // TODO: Use string resources
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.mipmap.ic_launcher_edh)
-                //.setContentTitle("Did you " + intent.getStringExtra("habit_text").toLowerCase() + " today?")
-                .setContentText("Did you " + intent.getStringExtra("habit_text").toLowerCase() + " today?")
+                .setContentTitle(context.getString(R.string.app_name))
+                .setContentText(intent.getStringExtra("habit_text"))
                 .setContentIntent(openMainPendingIntent)
                 .setAutoCancel(true)
                 .setCategory(CATEGORY_REMINDER)
@@ -123,7 +122,7 @@ public class AlarmReceiver extends BroadcastReceiver
                 PackageManager.DONT_KILL_APP);
     }
 
-    public void cancelBootReiver(Context context){
+    public void cancelBootReceiver(Context context){
         // Disable {@code SampleBootReceiver} so that it doesn't automatically restart the
         // alarm when the device is rebooted.
         ComponentName receiver = new ComponentName(context, BootReceiver.class);

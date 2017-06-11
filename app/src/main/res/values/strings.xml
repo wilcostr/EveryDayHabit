@@ -2,11 +2,8 @@
     <string name="app_name">EveryDayHabit</string>
 
     <string name="action_settings">Settings</string>
-    <string name="action_reset">Reset</string>
     <string name="action_new_habit">New Habit</string>
     <string name="action_startup_info">Info</string>
-
-    <string name="button_2_text">Reset</string>
 
     <string name="edit_day_activity_title">Habit Progress Report</string>
     <string name="edit_day_default">Did you have a successful day?</string>
@@ -58,16 +55,24 @@
     <string name="preference_summary">"Summary"</string>
     <string name="preference_notification_time">"Notification Time"</string>
     <string name="preference_start_date">"Habit Start Date"</string>
+    <string name="preference_notification_tone">Notification Tone</string>
 
     <string name="default_habit_text">Default Habit Text</string>
     <string name="default_habit_word">Habit</string>
-    <string name="preference_notification_tone">Notification Tone</string>
+
+    <string name="motivation_default">The problems we face either break us, or make us.</string>
+    <string name="motivation_next">Next motivation</string>
 
     <string name="txt_habit">Habit</string>
     <string name="txt_new_habit">New Habit</string>
     <string name="txt_add_new_habit">Add New Habit</string>
     <string name="txt_no_reason">You didn\'t log a reason</string>
     <string name="txt_no_log">No progress logged</string>
+    <string name="txt_success_rate">"Success Rate: "</string>
+    <string name="txt_current_streak">"Current Streak: "</string>
+    <string name="txt_longest_streak">"Longest Streak: "</string>
+    <string name="txt_0_percent">0%</string>
+    <string name="txt_0">0</string>
 
     <string name="first_use_activity_title">EveryDayHabit</string>
     <string name="first_use_button">Let\'s Get Started</string>
@@ -108,7 +113,7 @@
         recent seven weeks only, but your stats will still be based on your progress since day one.
     </string>
     <string name="congratulations_button">Got It</string>
-    <string name="action_rate">Rate App</string>
 
+    <string name="action_rate">Rate App</string>
 
 </resources>

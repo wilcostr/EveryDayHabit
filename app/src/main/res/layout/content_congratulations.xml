@@ -28,6 +28,7 @@
         android:layout_marginTop="@dimen/text_margin"
         app:layout_constraintTop_toBottomOf="@+id/textViewCongratulations"
         android:layout_marginRight="@dimen/text_margin"
+        android:layout_marginEnd="@dimen/text_margin"
         app:layout_constraintRight_toRightOf="parent"
         android:onClick="onButtonCongratulationsClick"/>
 </android.support.constraint.ConstraintLayout>

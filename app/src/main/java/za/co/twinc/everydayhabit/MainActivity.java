@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -26,10 +25,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
-import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -49,11 +44,10 @@ public class MainActivity extends AppCompatActivity {
 
     public static final int EDIT_DAY_REQUEST        = 1;
     public static final int NEW_HABIT_REQUEST       = 2;
-    static final int        SETTINGS_REQUEST        = 3;
-    static final int        CONGRATULATE_REQUEST    = 4;
+    private final int       SETTINGS_REQUEST        = 3;
+    private final int       CONGRATULATE_REQUEST    = 4;
 
-    int streak_longest, streak_current, days_fail, days_fail_legit, days_success;
-    int current_habit;
+    private int current_habit;
 
     private TextView textViewSuccessRate, textViewCurrentStreak, textViewLongestStreak;
     private TextView textViewMotivation;
@@ -61,13 +55,6 @@ public class MainActivity extends AppCompatActivity {
     private SwipeAdapter swipeAdapter;
     private ViewPager viewPager;
     private static AlarmReceiver alarmReceiver;
-
-
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,15 +144,13 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
-    public void displayHabitContent(){
+    private void displayHabitContent(){
         // Quick return if we are displaying add new habit button
         if (current_habit==-1) return;
+
+        int streak_longest, streak_current, days_fail, days_fail_legit, days_success;
 
         SharedPreferences habit_log = getSharedPreferences(HABIT_PREFS+current_habit, 0);
         SharedPreferences.Editor habit_editor = habit_log.edit();
@@ -255,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
                         getIntFromPrefs(HABIT_PREFS+current_habit,"notify",8));
 
                 Calendar calendar = Calendar.getInstance();
-                calendar.setTimeInMillis(getLongFromPrefs(HABIT_PREFS+current_habit,"date",1490000000000L));
+                calendar.setTimeInMillis(getDateFromPrefs(HABIT_PREFS+current_habit));
                 String dateString = DateFormat.getDateFormat(this).format(calendar.getTime());
                 startSettings.putExtra("habit_date", dateString);
 
@@ -280,49 +265,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    public Action getIndexApiAction() {
-        Thing object = new Thing.Builder()
-                .setName("Main Page") // TODO: Define a title for the content shown.
-                // TODO: Make sure this auto-generated URL is correct.
-                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
-                .build();
-        return new Action.Builder(Action.TYPE_VIEW)
-                .setObject(object)
-                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
-                .build();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client.connect();
-        AppIndex.AppIndexApi.start(client, getIndexApiAction());
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        AppIndex.AppIndexApi.end(client, getIndexApiAction());
-        client.disconnect();
-    }
-
     public static String getStringFromPrefs(Context ctx, String pref, String key, String default_return){
         SharedPreferences log = ctx.getSharedPreferences(pref, 0);
         return log.getString(key, default_return);
     }
 
     // Overload method for non-static calls
-    public String getStringFromPrefs(String pref, String key, String default_return){
+    private String getStringFromPrefs(String pref, String key, String default_return){
         return getStringFromPrefs(this, pref, key, default_return);
     }
 
@@ -332,25 +281,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Overload method for non-static calls
-    public int getIntFromPrefs(String pref, String key, int default_return){
+    private int getIntFromPrefs(String pref, String key, int default_return){
         return getIntFromPrefs(this, pref, key, default_return);
     }
 
-    public static long getLongFromPrefs(Context ctx, String pref, String key, long default_return){
+    public static long getDateFromPrefs(Context ctx, String pref){
         SharedPreferences log = ctx.getSharedPreferences(pref, 0);
-        return log.getLong(key, default_return);
+        return log.getLong("date", 1490000000000L);
     }
 
     // Overload method for non-static calls
-    public long getLongFromPrefs(String pref, String key, long default_return){
-        return getLongFromPrefs(this, pref, key, default_return);
+    private long getDateFromPrefs(String pref){
+        return getDateFromPrefs(this, pref);
     }
 
     public void onButtonNextMotivationClick(View view){
         loadNewMotivation();
     }
 
-    public void deleteHabit(){
+    private void deleteHabit(){
         // Can't delete the button
         if (current_habit == -1) return;
 
@@ -413,15 +362,15 @@ public class MainActivity extends AppCompatActivity {
         builder.create().show();
     }
 
-    public boolean saveHabitMap(int[] map){
+    private void saveHabitMap(int[] map){
         SharedPreferences main_log = getSharedPreferences(MAIN_PREFS, 0);
         SharedPreferences.Editor main_editor = main_log.edit();
         for(int i=0;i<main_log.getInt("num_habits",0);i++)
             main_editor.putInt("habit_map_" + i, map[i]);
-        return main_editor.commit();
+        main_editor.apply();
     }
 
-    public static int[] loadHabitMap(Context ctx){
+    private static int[] loadHabitMap(Context ctx){
         SharedPreferences main_log = ctx.getSharedPreferences(MAIN_PREFS, 0);
         int size = main_log.getInt("num_habits",1);
         int[] map = new int[size];
@@ -431,9 +380,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Overload method for non-static calls
-    public int[] loadHabitMap(){ return loadHabitMap(this);}
+    private int[] loadHabitMap(){ return loadHabitMap(this);}
 
-    public int currentHabitIndex(){
+    private int currentHabitIndex(){
         int[] map = loadHabitMap();
         int i = 0;
         while(i<map.length){
@@ -452,7 +401,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Overload method for non-static calls
-    public int habitNumFromIndex(int idx) { return habitNumFromIndex(this, idx);}
+    private int habitNumFromIndex(int idx) { return habitNumFromIndex(this, idx);}
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -488,7 +437,10 @@ public class MainActivity extends AppCompatActivity {
                 habit_editor.putInt("log_entry_" + log_position, log_entry);
 
                 String reason = data.getStringExtra("reason");
-                if (reason != null) habit_editor.putString("log_reason_" + log_position, reason);
+                if (reason != null)
+                    habit_editor.putString("log_reason_" + log_position, reason);
+                else
+                    habit_editor.remove("log_reason_" + log_position);
                 habit_editor.apply();
                 swipeAdapter.notifyDataSetChanged();
                 displayHabitContent();
@@ -550,7 +502,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Set a recurring notification
-    public static void setHabitNotification(Context ctx, int habitNum){
+    private static void setHabitNotification(Context ctx, int habitNum){
         // Return if Notifications switched off in settings
         SharedPreferences settingsPref = PreferenceManager.getDefaultSharedPreferences(ctx);
         boolean notify = settingsPref.getBoolean(SettingsActivity.KEY_PREF_NOTIFICATION_SWITCH, false);
@@ -570,7 +522,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Overload method for non-static calls
-    public void setHabitNotification(int habitNum){setHabitNotification(this, habitNum); }
+    private void setHabitNotification(int habitNum){setHabitNotification(this, habitNum); }
 
     public static void setAllNotifications(Context ctx){
         int[] map = loadHabitMap(ctx);
@@ -583,7 +535,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Overload method for non-static calls
-    public void setAllNotifications(){ setAllNotifications(this);}
+    private void setAllNotifications(){ setAllNotifications(this);}
 
     // Clear a notification
     public static void cancelAllNotifications(Context ctx){
@@ -597,10 +549,10 @@ public class MainActivity extends AppCompatActivity {
             i++;
         }
         // Stop notifications being set on device boot
-        alarmReceiver.cancelBootReiver(ctx);
+        alarmReceiver.cancelBootReceiver(ctx);
     }
 
-    public void loadNewMotivation(){
+    private void loadNewMotivation(){
         //Start network thread here
         new GetMotivation().execute
                 ("http://api.forismatic.com/api/1.0/?method=getQuote&lang=en&format=text");

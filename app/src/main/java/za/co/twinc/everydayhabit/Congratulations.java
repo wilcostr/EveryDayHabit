@@ -3,6 +3,7 @@ package za.co.twinc.everydayhabit;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -16,8 +17,8 @@ public class Congratulations extends AppCompatActivity {
         setContentView(R.layout.activity_congratulations);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) actionBar.setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
         String habitText = intent.getStringExtra("habitText").trim().toLowerCase();
@@ -26,7 +27,6 @@ public class Congratulations extends AppCompatActivity {
 
         TextView textView = (TextView)findViewById(R.id.textViewCongratulations);
         textView.setText(getString(R.string.congratulations_text, habitText, habitRate, habitStreak));
-
     }
 
     public void onButtonCongratulationsClick(View view){

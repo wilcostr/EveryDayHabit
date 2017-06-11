@@ -28,17 +28,16 @@ import java.lang.String;
 
 
 public class SettingsActivity extends Activity {
-    public static Intent intent;
+    private static Intent intent;
 
-    public static final String KEY_PREF_HABIT_DESCRIPTION =     "edit_text_preference_habit_text";
-    public static final String KEY_PREF_HABIT_SUMMARY =         "edit_text_preference_habit_summary";
-    public static final String KEY_PREF_NOTIFICATION_TIME =     "time_picker_preference_notification";
-    public static final String KEY_PREF_NOTIFICATION_SWITCH =   "switch_preference_notification";
-    public static final String KEY_PREF_LEGIT_SWITCH =          "switch_preference_legit";
-    public static final String KEY_PREF_NOTIFICATION_TONE =     "ringtone_preference";
-    public static final String KEY_PREF_ABOUT =                 "simple_text_about";
-
-    public static final String KEY_PREF_DATE = "simple_text_habit_date";
+    private static final String KEY_PREF_HABIT_DESCRIPTION =     "edit_text_preference_habit_text";
+    private static final String KEY_PREF_HABIT_SUMMARY =         "edit_text_preference_habit_summary";
+    private static final String KEY_PREF_NOTIFICATION_TIME =     "time_picker_preference_notification";
+    public static final  String KEY_PREF_NOTIFICATION_SWITCH =   "switch_preference_notification";
+    public static final  String KEY_PREF_LEGIT_SWITCH =          "switch_preference_legit";
+    public static final  String KEY_PREF_NOTIFICATION_TONE =     "ringtone_preference";
+    private static final String KEY_PREF_ABOUT =                 "simple_text_about";
+    private static final String KEY_PREF_DATE =                  "simple_text_habit_date";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +81,7 @@ public class SettingsActivity extends Activity {
         //Make timePicker available throughout the class
         Preference timePref;
 
-        SharedPreferences.OnSharedPreferenceChangeListener listener =
+        final SharedPreferences.OnSharedPreferenceChangeListener listener =
                 new SharedPreferences.OnSharedPreferenceChangeListener(){
                     public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
                         // listener implementation
@@ -135,7 +134,7 @@ public class SettingsActivity extends Activity {
 
             // Set about string
             p = preferenceManager.findPreference(KEY_PREF_ABOUT);
-            String versionName = "0";
+            String versionName;
             try {
                 versionName = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0).versionName;
             }catch (PackageManager.NameNotFoundException e){
@@ -144,13 +143,11 @@ public class SettingsActivity extends Activity {
             p.setSummary(versionName);
 
             // Set notification tone
-            // TODO: Test default
             p = preferenceManager.findPreference(KEY_PREF_NOTIFICATION_TONE);
-            //p.setDefaultValue(Settings.System.DEFAULT_NOTIFICATION_URI.toString());
-            String toneStr = preferenceManager.getDefaultSharedPreferences(getActivity())
+            String toneStr = PreferenceManager.getDefaultSharedPreferences(getActivity())
                     .getString(KEY_PREF_NOTIFICATION_TONE, Settings.System.DEFAULT_NOTIFICATION_URI.toString());
             if ( toneStr.equals(Settings.System.DEFAULT_NOTIFICATION_URI.toString()) ) {
-                preferenceManager.getDefaultSharedPreferences(getActivity()).edit()
+                PreferenceManager.getDefaultSharedPreferences(getActivity()).edit()
                         .putString(KEY_PREF_NOTIFICATION_TONE, Settings.System.DEFAULT_NOTIFICATION_URI.toString())
                         .apply();
             }
@@ -172,7 +169,6 @@ public class SettingsActivity extends Activity {
             p = preferenceManager.findPreference(KEY_PREF_DATE);
             p.setSummary(intent.getStringExtra("habit_date"));
 
-
             // Get notification time
             int hour = intent.getIntExtra("habit_time",0)/60;
             int minute = intent.getIntExtra("habit_time",0)%60;
@@ -191,7 +187,6 @@ public class SettingsActivity extends Activity {
                     return false;
                 }
             });
-
         }
 
         @Override
@@ -214,12 +209,6 @@ public class SettingsActivity extends Activity {
                                 String.format(Locale.UK, "%02d",minute));
             intent.putExtra("habit_time", hour*60+minute);
         }
-
-        @Override
-        public void onActivityResult(int requestCode, int resultCode, Intent data) {
-            super.onActivityResult(requestCode,resultCode,data);
-        }
     }
-
 }
 
