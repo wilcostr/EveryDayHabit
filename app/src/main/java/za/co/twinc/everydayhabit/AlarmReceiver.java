@@ -1,6 +1,7 @@
 package za.co.twinc.everydayhabit;
 
 import android.app.AlarmManager;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -9,11 +10,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.view.View;
 
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
@@ -70,7 +74,8 @@ public class AlarmReceiver extends BroadcastReceiver
 
         // Create notification builder
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.mipmap.ic_launcher_edh)
+                .setSmallIcon(R.drawable.small_icon)
+                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher_edh))
                 .setContentTitle(context.getString(R.string.app_name))
                 .setContentText(intent.getStringExtra("habit_text"))
                 .setContentIntent(openMainPendingIntent)
@@ -79,9 +84,22 @@ public class AlarmReceiver extends BroadcastReceiver
                 .setVibrate(new long[]{1000, 200, 100, 200})
                 .setSound(ringtoneUri);
 
+        // Build the notification
+        Notification notification = mBuilder.build();
+
+        // Hide small icon in Lollipop and Marshmallow notification pull down list as it looks shit
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP &&
+                Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
+            int smallIconViewId = context.getResources().getIdentifier("right_icon", "id", android.R.class.getPackage().getName());
+            //noinspection deprecation
+            if (notification.contentView != null)
+                //noinspection deprecation
+                notification.contentView.setViewVisibility(smallIconViewId, View.INVISIBLE);
+        }
+
+        // Issues notification
         NotificationManager mNotifyMgr = (NotificationManager)context.getSystemService(NOTIFICATION_SERVICE);
-        // Builds the notification and issues it.
-        mNotifyMgr.notify(habitNum, mBuilder.build());
+        mNotifyMgr.notify(habitNum, notification);
     }
 
     public void setAlarm(Context context, String habitText, int habitNum, int habitTime) {
@@ -112,7 +130,7 @@ public class AlarmReceiver extends BroadcastReceiver
     }
 
     public void setBootReceiver(Context context){
-        // Enable {@code SampleBootReceiver} to automatically restart the alarm when the
+        // Enable {@code BootReceiver} to automatically restart the alarm when the
         // device is rebooted.
         ComponentName receiver = new ComponentName(context, BootReceiver.class);
         PackageManager pm = context.getPackageManager();
@@ -123,7 +141,7 @@ public class AlarmReceiver extends BroadcastReceiver
     }
 
     public void cancelBootReceiver(Context context){
-        // Disable {@code SampleBootReceiver} so that it doesn't automatically restart the
+        // Disable {@code BootReceiver} so that it doesn't automatically restart the
         // alarm when the device is rebooted.
         ComponentName receiver = new ComponentName(context, BootReceiver.class);
         PackageManager pm = context.getPackageManager();

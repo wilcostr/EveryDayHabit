@@ -48,11 +48,10 @@
         </activity>
 
         <receiver android:name=".AlarmReceiver" />
-        <receiver
-            android:name=".BootReceiver"
-            android:enabled="false">
+        <receiver android:name=".BootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
 

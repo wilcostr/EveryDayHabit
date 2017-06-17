@@ -16,6 +16,7 @@ public class FirstUseActivity extends AppCompatActivity {
 
     }
 
+    @SuppressWarnings("UnusedParameters")
     public void onButtonFirstUseClick(View view){
         finish();
     }

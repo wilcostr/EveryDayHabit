@@ -63,6 +63,7 @@ public class NewHabitActivity extends AppCompatActivity {
 
     }
 
+    @SuppressWarnings("UnusedParameters")
     public void onButtonDoneClick(View view) {
         DialogFragment newFragment = new TimePickerFragment();
         newFragment.show(getSupportFragmentManager(), "timePicker");

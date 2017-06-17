@@ -29,6 +29,7 @@ public class Congratulations extends AppCompatActivity {
         textView.setText(getString(R.string.congratulations_text, habitText, habitRate, habitStreak));
     }
 
+    @SuppressWarnings("UnusedParameters")
     public void onButtonCongratulationsClick(View view){
         setResult(Activity.RESULT_OK);
         finish();

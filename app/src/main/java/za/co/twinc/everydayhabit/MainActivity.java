@@ -214,7 +214,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -295,6 +294,7 @@ public class MainActivity extends AppCompatActivity {
         return getDateFromPrefs(this, pref);
     }
 
+    @SuppressWarnings("UnusedParameters")
     public void onButtonNextMotivationClick(View view){
         loadNewMotivation();
     }
@@ -527,6 +527,10 @@ public class MainActivity extends AppCompatActivity {
     public static void setAllNotifications(Context ctx){
         int[] map = loadHabitMap(ctx);
         int i = 0;
+
+        // Check if alarmReceiver is initiated
+        if (alarmReceiver == null) alarmReceiver = new AlarmReceiver();
+
         while(i<map.length){
             setHabitNotification(ctx, map[i]);
             i++;
