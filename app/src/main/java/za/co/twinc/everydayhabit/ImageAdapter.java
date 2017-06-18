@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
-
 import java.util.Locale;
 
 import static za.co.twinc.everydayhabit.MainActivity.NUM_LOG_ENTRIES;

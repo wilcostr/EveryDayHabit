@@ -42,6 +42,8 @@ public class AlarmReceiver extends BroadcastReceiver
     {
         int habitNum = intent.getIntExtra("habit_number",-1);
 
+        //TODO: Check if MainActivity can be accessed if app was force killed
+
         long timeStart = MainActivity.getDateFromPrefs(context, MainActivity.HABIT_PREFS+habitNum
         );
         long timeDiff = System.currentTimeMillis() - timeStart;
@@ -97,7 +99,7 @@ public class AlarmReceiver extends BroadcastReceiver
                 notification.contentView.setViewVisibility(smallIconViewId, View.INVISIBLE);
         }
 
-        // Issues notification
+        // Issue notification
         NotificationManager mNotifyMgr = (NotificationManager)context.getSystemService(NOTIFICATION_SERVICE);
         mNotifyMgr.notify(habitNum, notification);
     }

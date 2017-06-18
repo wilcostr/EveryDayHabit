@@ -52,7 +52,7 @@
         and will break streaks</string>
     <string name="preference_about">"EveryDayHabit Version"</string>
     <string name="preference_description">"Description"</string>
-    <string name="preference_summary">"Summary"</string>
+    <string name="preference_summary">"Tab Text"</string>
     <string name="preference_notification_time">"Notification Time"</string>
     <string name="preference_start_date">"Habit Start Date"</string>
     <string name="preference_notification_tone">Notification Tone</string>

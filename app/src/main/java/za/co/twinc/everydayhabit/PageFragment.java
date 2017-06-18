@@ -37,6 +37,7 @@ public class PageFragment extends Fragment {
     // TextView in a Fragment to display full habit text
     private GridView gridContent;
     private int habitNum;
+    private TextView textViewHabit;
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -45,7 +46,7 @@ public class PageFragment extends Fragment {
         View view = inflater.inflate(R.layout.content_page_fragment, container, false);
         Bundle bundle = getArguments();
 
-        TextView textViewHabit = (TextView) view.findViewById(R.id.textView_swipe);
+        textViewHabit = (TextView) view.findViewById(R.id.textView_swipe);
         gridContent = (GridView) view.findViewById(R.id.content_grid);
 
         int habitPosition = bundle.getInt("num");

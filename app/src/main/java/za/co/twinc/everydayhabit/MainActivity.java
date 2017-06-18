@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -107,15 +108,19 @@ public class MainActivity extends AppCompatActivity {
         viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(swipeAdapter);
         viewPager.setCurrentItem(currentHabitIndex());
-        viewPager.setCurrentItem(currentHabitIndex());
 
         TabLayout tabs = (TabLayout) findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
 
-        //Initialise stats
-        textViewSuccessRate = (TextView) findViewById(R.id.textViewSuccessRate);
-        textViewCurrentStreak = (TextView) findViewById(R.id.textViewCurrentStreak);
-        textViewLongestStreak = (TextView) findViewById(R.id.textViewLongestStreak);
+        // If any habit has a long name we extend the PageFragment height
+        int[] map = loadHabitMap();
+        for(int i=0; i<map.length; i++) {
+            if (getStringFromPrefs(HABIT_PREFS+map[i],"habit","Habit").length() > 35){
+                viewPager.setLayoutParams(new ConstraintLayout.LayoutParams(
+                        ConstraintLayout.LayoutParams.MATCH_PARENT,
+                        (int)getResources().getDimension(R.dimen.fragment_height_extended)));
+            }
+        }
 
         viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
@@ -129,6 +134,11 @@ public class MainActivity extends AppCompatActivity {
                 displayHabitContent();
             }
         });
+
+        // Initialise stats
+        textViewSuccessRate = (TextView) findViewById(R.id.textViewSuccessRate);
+        textViewCurrentStreak = (TextView) findViewById(R.id.textViewCurrentStreak);
+        textViewLongestStreak = (TextView) findViewById(R.id.textViewLongestStreak);
         displayHabitContent();
 
         //MobileAds.initialize(getApplicationContext(),"ca-app-pub-5782047288878600~9640464773");
@@ -147,52 +157,47 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void displayHabitContent(){
-        // Quick return if we are displaying add new habit button
-        if (current_habit==-1) return;
+        int streak_longest = 0, streak_current = 0, days_fail = 0;
+        int days_fail_legit = 0, days_success = 0;
 
-        int streak_longest, streak_current, days_fail, days_fail_legit, days_success;
+        if (current_habit != -1) {
+            SharedPreferences habit_log = getSharedPreferences(HABIT_PREFS + current_habit, 0);
+            SharedPreferences.Editor habit_editor = habit_log.edit();
 
-        SharedPreferences habit_log = getSharedPreferences(HABIT_PREFS+current_habit, 0);
-        SharedPreferences.Editor habit_editor = habit_log.edit();
+            // Include/Exclude legit excuses based on settings
+            SharedPreferences settingsPref = PreferenceManager.getDefaultSharedPreferences(this);
+            boolean includeLegit = settingsPref.getBoolean(SettingsActivity.KEY_PREF_LEGIT_SWITCH, false);
 
-        // Include/Exclude legit excuses based on settings
-        SharedPreferences settingsPref = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean includeLegit = settingsPref.getBoolean(SettingsActivity.KEY_PREF_LEGIT_SWITCH, false);
+            long timeDiff = System.currentTimeMillis() - habit_log.getLong("date", 1490000000000L);
+            long numDays = TimeUnit.DAYS.convert(timeDiff, TimeUnit.MILLISECONDS);
 
-        long timeDiff = System.currentTimeMillis() - habit_log.getLong("date", 1490000000000L);
-        long numDays =  TimeUnit.DAYS.convert(timeDiff,TimeUnit.MILLISECONDS);
+            for (int i = 0; i <= numDays; i++) {
+                int log_entry = habit_log.getInt("log_entry_" + i, -1);
 
-        streak_current = 0; streak_longest = 0;
-        days_success = 0; days_fail = 0; days_fail_legit = 0;
-        for (int i = 0; i <= numDays; i++) {
-            int log_entry = habit_log.getInt("log_entry_"+i, -1);
-
-            if (log_entry == -1 && i < numDays) {
-                log_entry = 1;             // Assume failure with no report
-                habit_editor.putString("log_reason_"+i, getString(R.string.txt_no_log));
-                habit_editor.putInt("log_entry_"+i, 1);
-            }
-            if (log_entry == 0) {          // Successful day
-                days_success ++;
-                streak_current ++;
-            }
-            else if (log_entry == 1){      // Failure with no legit reason
-                days_fail ++;
-                streak_current = 0;
-            }
-            else if (log_entry == 2){      // Failure with legit reason
-                if (includeLegit){
-                    days_success ++;
-                    streak_current ++;
+                if (log_entry == -1 && i < numDays) {
+                    log_entry = 1;             // Assume failure with no report
+                    habit_editor.putString("log_reason_" + i, getString(R.string.txt_no_log));
+                    habit_editor.putInt("log_entry_" + i, 1);
                 }
-                else{
-                    days_fail_legit ++;
+                if (log_entry == 0) {          // Successful day
+                    days_success++;
+                    streak_current++;
+                } else if (log_entry == 1) {      // Failure with no legit reason
+                    days_fail++;
                     streak_current = 0;
+                } else if (log_entry == 2) {      // Failure with legit reason
+                    if (includeLegit) {
+                        days_success++;
+                        streak_current++;
+                    } else {
+                        days_fail_legit++;
+                        streak_current = 0;
+                    }
                 }
+                if (streak_current > streak_longest) streak_longest = streak_current;
             }
-            if (streak_current > streak_longest) streak_longest = streak_current;
+            habit_editor.apply();
         }
-        habit_editor.apply();
 
         //Set stats
         int total_days = days_success+days_fail+days_fail_legit;
@@ -205,12 +210,15 @@ public class MainActivity extends AppCompatActivity {
         textViewCurrentStreak.setText(currentStreak);
         textViewLongestStreak.setText(longestStreak);
 
-        if (total_days==NUM_LOG_ENTRIES && habit_log.getBoolean("showCongrats",true)){
-            Intent intent = new Intent(this, Congratulations.class);
-            intent.putExtra("habitText", habit_log.getString("habit",getString(R.string.txt_habit)));
-            intent.putExtra("rate", successRate);
-            intent.putExtra("streak", longestStreak);
-            startActivityForResult(intent,CONGRATULATE_REQUEST);
+        if (total_days==NUM_LOG_ENTRIES ){
+            SharedPreferences habit_log = getSharedPreferences(HABIT_PREFS + current_habit, 0);
+            if (habit_log.getBoolean("showCongrats",true)) {
+                Intent intent = new Intent(this, Congratulations.class);
+                intent.putExtra("habitText", habit_log.getString("habit", getString(R.string.txt_habit)));
+                intent.putExtra("rate", successRate);
+                intent.putExtra("streak", longestStreak);
+                startActivityForResult(intent, CONGRATULATE_REQUEST);
+            }
         }
     }
 
@@ -328,6 +336,8 @@ public class MainActivity extends AppCompatActivity {
                 SharedPreferences.Editor main_editor = main_log.edit();
                 main_editor.putInt("num_habits", size-1);
 
+                int next_habit = 0;
+
                 if (size>1) {
                     // Shift all habits after current_habit by one to overwrite current_habit
                     int[] habitMap = loadHabitMap();
@@ -335,13 +345,13 @@ public class MainActivity extends AppCompatActivity {
                     for (int i = 0; i < size; i++) {
                         if (shift)
                             habitMap[i - 1] = habitMap[i];
-                        if (habitMap[i] == current_habit) {
+                        else if (habitMap[i] == current_habit) {
                             shift = true;
                             // Display the next habit (limit to new size-1 if last habit deleted)
-                            current_habit = habitMap[Math.min(i + 1, size - 2)];
+                            next_habit = Math.min(i + 1, size - 2);
                         }
-
                     }
+                    current_habit = habitMap[next_habit];
                     saveHabitMap(habitMap);
                 }
 
@@ -351,6 +361,8 @@ public class MainActivity extends AppCompatActivity {
                 habit_editor.apply();
                 main_editor.apply();
                 swipeAdapter.notifyDataSetChanged();
+                viewPager.setCurrentItem(next_habit);
+                displayHabitContent();
             }
         });
 
@@ -422,7 +434,6 @@ public class MainActivity extends AppCompatActivity {
                 // Update display
                 swipeAdapter.notifyDataSetChanged();
                 displayHabitContent();
-
             }
             else if (requestCode == EDIT_DAY_REQUEST) {
                 // Cancel the notification if it is still visible
