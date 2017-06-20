@@ -37,7 +37,6 @@ public class PageFragment extends Fragment {
     // TextView in a Fragment to display full habit text
     private GridView gridContent;
     private int habitNum;
-    private TextView textViewHabit;
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -46,7 +45,7 @@ public class PageFragment extends Fragment {
         View view = inflater.inflate(R.layout.content_page_fragment, container, false);
         Bundle bundle = getArguments();
 
-        textViewHabit = (TextView) view.findViewById(R.id.textView_swipe);
+        TextView textViewHabit = (TextView) view.findViewById(R.id.textView_swipe);
         gridContent = (GridView) view.findViewById(R.id.content_grid);
 
         int habitPosition = bundle.getInt("num");
@@ -112,7 +111,7 @@ public class PageFragment extends Fragment {
                             getString(R.string.txt_no_reason));
                     if ( (getIntFromPrefs(getContext(), HABIT_PREFS+habitNum,"log_entry_"+(position+offset),-1) == 0) &&
                             (reason.equals(getString(R.string.txt_no_reason))) )
-                        reason = getPraise();
+                        reason = getString(R.string.txt_no_comment);
                     Toast.makeText(getContext(), reason, Toast.LENGTH_SHORT).show();
                 }
             }
@@ -185,10 +184,5 @@ public class PageFragment extends Fragment {
 
         // Initialise gridContent with latest log_entries
         gridContent.setAdapter(new ImageAdapter(getContext(), log_entries, offset));
-    }
-
-    private String getPraise(){
-        String[] praise = getResources().getStringArray(R.array.praise);
-        return praise[(int)(Math.random()*praise.length)];
     }
 }

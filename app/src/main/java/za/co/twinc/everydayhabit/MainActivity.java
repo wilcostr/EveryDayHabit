@@ -71,7 +71,11 @@ public class MainActivity extends AppCompatActivity {
 
         if (startMainIntent != null) {
             current_habit = startMainIntent.getIntExtra("habit", -1);
-            currentDay = startMainIntent.getIntExtra("day", -1);
+            long timeStart = getDateFromPrefs(HABIT_PREFS+current_habit);
+            long timeDiff = System.currentTimeMillis() - timeStart;
+            currentDay =  (int)TimeUnit.DAYS.convert(timeDiff,TimeUnit.MILLISECONDS);
+            // Prevent intent from being read on rotate
+            startMainIntent.removeExtra("habit");
         }
 
         if (current_habit != -1){
@@ -112,13 +116,13 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabs = (TabLayout) findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
 
-        // If any habit has a long name we extend the PageFragment height
+        // Hack fix: If any habit has a long name we extend the PageFragment height
         int[] map = loadHabitMap();
-        for(int i=0; i<map.length; i++) {
-            if (getStringFromPrefs(HABIT_PREFS+map[i],"habit","Habit").length() > 35){
+        for (int aMap : map) {
+            if (getStringFromPrefs(HABIT_PREFS + aMap, "habit", "Habit").length() > 35) {
                 viewPager.setLayoutParams(new ConstraintLayout.LayoutParams(
                         ConstraintLayout.LayoutParams.MATCH_PARENT,
-                        (int)getResources().getDimension(R.dimen.fragment_height_extended)));
+                        (int) getResources().getDimension(R.dimen.fragment_height_extended)));
             }
         }
 

@@ -42,12 +42,13 @@ public class AlarmReceiver extends BroadcastReceiver
     {
         int habitNum = intent.getIntExtra("habit_number",-1);
 
-        //TODO: Check if MainActivity can be accessed if app was force killed
-
-        long timeStart = MainActivity.getDateFromPrefs(context, MainActivity.HABIT_PREFS+habitNum
-        );
+        long timeStart = MainActivity.getDateFromPrefs(context, MainActivity.HABIT_PREFS+habitNum);
         long timeDiff = System.currentTimeMillis() - timeStart;
         long numDays =  TimeUnit.DAYS.convert(timeDiff,TimeUnit.MILLISECONDS);
+
+        // Early exit if the default date was received from MainActivity
+        if (timeStart==1490000000000L)
+            return;
 
         if (timeDiff < 0 || MainActivity.getIntFromPrefs(context,MainActivity.HABIT_PREFS+habitNum,
                 "log_entry_"+numDays, -1) != -1) {
@@ -58,7 +59,6 @@ public class AlarmReceiver extends BroadcastReceiver
         // Create intent to open Main, load habit number in extras
         Intent openMainIntent = new Intent(context, MainActivity.class);
         openMainIntent.putExtra("habit", habitNum);
-        openMainIntent.putExtra("day", (int)numDays);
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
         // Adds the back stack for the Intent (but not the Intent itself)
