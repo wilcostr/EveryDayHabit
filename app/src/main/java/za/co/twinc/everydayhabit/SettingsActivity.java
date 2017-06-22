@@ -5,7 +5,6 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -18,9 +17,7 @@ import android.preference.SwitchPreference;
 import android.provider.Settings;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TimePicker;
 
 import java.util.Locale;
@@ -43,29 +40,21 @@ public class SettingsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        intent = getIntent();
-
-        // Display the fragment as the main content.
-        getFragmentManager().beginTransaction()
-                .replace(android.R.id.content, new SettingsFragment())
-                .commit();
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-
-        LinearLayout root = (LinearLayout) findViewById(android.R.id.list).getParent().getParent().getParent();
-        Toolbar bar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.settings_toolbar, root, false);
-        //bar.setTitleTextColor(Color.WHITE);
-        bar.setBackgroundColor(Color.LTGRAY);
-        root.addView(bar, 0); // insert at top
+        setContentView(R.layout.activity_settings);
+        Toolbar bar = (Toolbar) findViewById(R.id.toolbar);
         bar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onBackPressed();
             }
         });
+
+        intent = getIntent();
+
+        // Display the fragment as the main content.
+        getFragmentManager().beginTransaction()
+                .replace(R.id.settings_container, new SettingsFragment())
+                .commit();
     }
 
     @Override
@@ -91,8 +80,8 @@ public class SettingsActivity extends Activity {
                             pref.setSummary(prefs.getString(key, ""));
                             // Return new values
                             if (key.equals(KEY_PREF_HABIT_DESCRIPTION))
-                                intent.putExtra("habit_text",prefs.getString(key,""));
-                            else intent.putExtra("habit_summary",prefs.getString(key,""));
+                                intent.putExtra("habit_text",prefs.getString(key,"").trim());
+                            else intent.putExtra("habit_summary",prefs.getString(key,"").trim());
                         }
                         else if (key.equals(KEY_PREF_NOTIFICATION_SWITCH)){
                             Preference pref = findPreference(KEY_PREF_NOTIFICATION_TONE);
