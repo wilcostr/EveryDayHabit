@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (current_habit != -1){
-            //Main activity started with intent
+            //Main activity started with intent by habit notification
             SharedPreferences.Editor editor = main_log.edit();
             editor.putInt("habit_to_display", current_habit);
             editor.apply();
@@ -95,21 +95,31 @@ public class MainActivity extends AppCompatActivity {
         }
         else{
             current_habit = main_log.getInt("habit_to_display",0);
-        }
-
-        // Display First Use Info if no habits created
-        if (getIntFromPrefs(MAIN_PREFS,"num_habits",0) == 0){
-            current_habit = -1;
-            Intent intent = new Intent(getApplicationContext(), FirstUseActivity.class);
-            startActivity(intent);
+            // current_habit might still be -1 if we exit the app on the new habit page.
+            // In this case we display the first habit in the list.
+            if (current_habit == -1){
+                current_habit = habitNumFromIndex(0);
+                SharedPreferences.Editor editor = main_log.edit();
+                editor.putInt("habit_to_display", current_habit);
+                editor.apply();
+            }
         }
 
         // Set alarmReceiver for notifications
         alarmReceiver = new AlarmReceiver();
         setAllNotifications();
 
-        // ViewPager and its adapters use support library
-        // fragments, so use getSupportFragmentManager.
+        // Display First Use Info if no habits created
+        if (getIntFromPrefs(MAIN_PREFS,"num_habits",0) == 0){
+            current_habit = -1;
+            Intent intent = new Intent(getApplicationContext(), FirstUseActivity.class);
+            startActivity(intent);
+
+            // Set up a notification to remind user to add first habit
+            alarmReceiver.setNoHabitAlarm(this);
+        }
+
+        // ViewPager and adapters use support library fragments, so use getSupportFragmentManager.
         swipeAdapter = new SwipeAdapter(getSupportFragmentManager());
         viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(swipeAdapter);
@@ -311,6 +321,16 @@ public class MainActivity extends AppCompatActivity {
     @SuppressWarnings("UnusedParameters")
     public void onButtonNextMotivationClick(View view){
         loadNewMotivation();
+    }
+
+    @SuppressWarnings("UnusedParameters")
+    public void onButtonShareMotivationClick(View view){
+        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+        sharingIntent.setType("text/plain");
+        String shareBody = (String)textViewMotivation.getText();
+        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+        startActivity(Intent.createChooser(sharingIntent,
+                getResources().getText(R.string.motivation_share)));
     }
 
     private void rateApp(){
@@ -568,7 +588,7 @@ public class MainActivity extends AppCompatActivity {
             setHabitNotification(ctx, map[i]);
             i++;
         }
-        alarmReceiver.setBootReceiver(ctx);
+        if (i>0) alarmReceiver.setBootReceiver(ctx);
     }
 
     // Overload method for non-static calls

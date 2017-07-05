@@ -40,20 +40,36 @@ public class AlarmReceiver extends BroadcastReceiver
     @Override
     public void onReceive(Context context, Intent intent)
     {
-        int habitNum = intent.getIntExtra("habit_number",-1);
+        int habitNum;
+        String notificationText;
 
-        long timeStart = MainActivity.getDateFromPrefs(context, MainActivity.HABIT_PREFS+habitNum);
-        long timeDiff = System.currentTimeMillis() - timeStart;
-        long numDays =  TimeUnit.DAYS.convert(timeDiff,TimeUnit.MILLISECONDS);
+        // We caught alarm that no habit has been set for 24 hours
+        if (intent.getBooleanExtra("no_habit",false)){
+            // Verify number of habits to be zero
+            if (MainActivity.getIntFromPrefs(context, MainActivity.MAIN_PREFS,"num_habits",0) > 0)
+                return;
 
-        // Early exit if the default date was received from MainActivity
-        if (timeStart==1490000000000L)
-            return;
+            habitNum = -1;
+            notificationText = (String)context.getResources().getText(R.string.first_use_reminder);
+        }
+        // We caught a habit alarm
+        else {
+            habitNum = intent.getIntExtra("habit_number", -1);
+            notificationText = intent.getStringExtra("habit_text");
 
-        if (timeDiff < 0 || MainActivity.getIntFromPrefs(context,MainActivity.HABIT_PREFS+habitNum,
-                "log_entry_"+numDays, -1) != -1) {
-            // Only starting habit tomorrow OR already reported progress today
-            return;
+            long timeStart = MainActivity.getDateFromPrefs(context, MainActivity.HABIT_PREFS + habitNum);
+            long timeDiff = System.currentTimeMillis() - timeStart;
+            long numDays = TimeUnit.DAYS.convert(timeDiff, TimeUnit.MILLISECONDS);
+
+            // Early exit if the default date was received from MainActivity
+            if (timeStart == 1490000000000L)
+                return;
+
+            if (timeDiff < 0 || MainActivity.getIntFromPrefs(context, MainActivity.HABIT_PREFS + habitNum,
+                    "log_entry_" + numDays, -1) != -1) {
+                // Only starting habit tomorrow OR already reported progress today
+                return;
+            }
         }
 
         // Create intent to open Main, load habit number in extras
@@ -79,7 +95,7 @@ public class AlarmReceiver extends BroadcastReceiver
                 .setSmallIcon(R.drawable.small_icon)
                 .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher_edh))
                 .setContentTitle(context.getString(R.string.app_name))
-                .setContentText(intent.getStringExtra("habit_text"))
+                .setContentText(notificationText)
                 .setContentIntent(openMainPendingIntent)
                 .setAutoCancel(true)
                 .setCategory(CATEGORY_REMINDER)
@@ -122,6 +138,21 @@ public class AlarmReceiver extends BroadcastReceiver
 
         alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP,
                 calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmIntent);
+    }
+
+    public void setNoHabitAlarm(Context context){
+        alarmMgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(context, AlarmReceiver.class);
+        intent.putExtra("no_habit",true);
+        alarmIntent = PendingIntent.getBroadcast(context, -1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.DATE,1);
+
+        alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP,
+                calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmIntent);
+
     }
 
     public void cancelAlarm() {

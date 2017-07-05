@@ -61,7 +61,8 @@
     <string name="default_habit_word">Habit</string>
 
     <string name="motivation_default">The problems we face either break us, or make us.</string>
-    <string name="motivation_next">Next motivation</string>
+    <string name="motivation_next">Next Motivation</string>
+    <string name="motivation_share">Share Motivation</string>
 
     <string name="txt_habit">Habit</string>
     <string name="txt_new_habit">New Habit</string>
@@ -104,6 +105,7 @@
         habits have on our lives, but these are the basics you need to get started. Make it simple,
         keep the trigger and reward consistent, and do it every day!
     </string>
+    <string name="first_use_reminder">Start a micro-habit today!</string>
 
     <string name="congratulations_activity_title">Congratulations!</string>
     <string name="congratulations_text">
