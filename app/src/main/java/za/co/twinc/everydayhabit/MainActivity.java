@@ -1,13 +1,17 @@
 package za.co.twinc.everydayhabit;
 
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.constraint.ConstraintLayout;
@@ -327,10 +331,27 @@ public class MainActivity extends AppCompatActivity {
     public void onButtonShareMotivationClick(View view){
         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
-        String shareBody = (String)textViewMotivation.getText();
-        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
-        startActivity(Intent.createChooser(sharingIntent,
-                getResources().getText(R.string.motivation_share)));
+        String shareText = (String)textViewMotivation.getText();
+        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareText);
+
+        if (Build.VERSION.SDK_INT >= 22) {
+            Intent receiverIntent = new Intent(this, MotivationReceiver.class);
+            receiverIntent.putExtra("Motivation",shareText);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, receiverIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            startActivity(Intent.createChooser(sharingIntent,
+                    getResources().getText(R.string.motivation_share),
+                    pendingIntent.getIntentSender()));
+        }
+        else{
+            // We cannot detect if Facebook was selected, so copy motivation to clipboard
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText("Motivation", shareText);
+            clipboard.setPrimaryClip(clip);
+            startActivity(Intent.createChooser(sharingIntent,
+                    getResources().getText(R.string.motivation_share)));
+            Toast.makeText(this, getResources().getString(R.string.motivation_copied), Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void rateApp(){

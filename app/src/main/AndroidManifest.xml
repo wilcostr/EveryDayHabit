@@ -47,8 +47,10 @@
                 android:value="za.co.twinc.everydayhabit.MainActivity" />
         </activity>
 
+        <receiver android:name=".MotivationReceiver" />
         <receiver android:name=".AlarmReceiver" />
-        <receiver android:name=".BootReceiver">
+        <receiver
+            android:name=".BootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />

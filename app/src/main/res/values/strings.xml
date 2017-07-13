@@ -63,6 +63,7 @@
     <string name="motivation_default">The problems we face either break us, or make us.</string>
     <string name="motivation_next">Next Motivation</string>
     <string name="motivation_share">Share Motivation</string>
+    <string name="motivation_copied">Motivation copied to clipboard</string>
 
     <string name="txt_habit">Habit</string>
     <string name="txt_new_habit">New Habit</string>
