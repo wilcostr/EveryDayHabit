@@ -18,7 +18,7 @@
         android:orderInCategory="104"
         android:title="@string/action_startup_info"/>
     <item
-        android:id="@+id/action_rate"
+        android:id="@+id/action_feedback"
         android:orderInCategory="105"
-        android:title="@string/action_rate" />
+        android:title="@string/action_feedback" />
 </menu>

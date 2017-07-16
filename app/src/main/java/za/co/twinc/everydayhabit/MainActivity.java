@@ -284,8 +284,8 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), FirstUseActivity.class);
                 startActivity(intent);
                 return true;
-            case R.id.action_rate:
-                rateApp();
+            case R.id.action_feedback:
+                feedback();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -354,14 +354,53 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void feedback(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getResources().getString(R.string.feedback_title));
+        builder.setMessage(getResources().getString(R.string.feedback_msg));
+
+        builder.setPositiveButton(getResources().getString(R.string.btn_rate_app), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                rateApp();
+            }
+        });
+
+        builder.setNeutralButton(getResources().getString(R.string.btn_contact_us), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+                emailIntent.setData(Uri.parse("mailto:dev.twinc@gmail.com?subject=EDH%20feedback"));
+
+                try {
+                    startActivity(emailIntent);
+                } catch (ActivityNotFoundException e) {
+                    Toast.makeText(MainActivity.this,getResources().getString(R.string.txt_no_email),
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+        builder.setNegativeButton(getResources().getString(R.string.btn_cancel), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        builder.create().show();
+    }
+
+    @SuppressWarnings("deprecation")
     private void rateApp(){
         Uri uri = Uri.parse("market://details?id=" + getPackageName());
         Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
         // To count with Play market backstack, After pressing back button,
         // to taken back to our application, we need to add following flags to intent.
-        goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
-                Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
+        goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            goToMarket.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
                 Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+        else
+            goToMarket.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+
         try {
             startActivity(goToMarket);
         } catch (ActivityNotFoundException e) {
@@ -374,20 +413,20 @@ public class MainActivity extends AppCompatActivity {
         // Can't delete the button
         if (current_habit == -1) return;
 
-        // Remove notification
-        // Call setHabitNotification for alarmReceiver to set up the correct intent to cancel
-        setHabitNotification(getApplicationContext(), current_habit);
-        alarmReceiver.cancelAlarm();
-
         final SharedPreferences habit_log = getSharedPreferences(HABIT_PREFS+current_habit, 0);
 
         final String habitText = habit_log.getString("habit",getString(R.string.txt_habit));
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Delete: " + habitText);
+        builder.setMessage(getResources().getString(R.string.txt_delete) + habitText);
 
-        builder.setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(getResources().getString(R.string.btn_delete), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
+
+                // Remove notification
+                // Call setHabitNotification for alarmReceiver to set up the correct intent to cancel
+                setHabitNotification(getApplicationContext(), current_habit);
+                alarmReceiver.cancelAlarm();
 
                 // Wipe shared preferences log for habit
                 SharedPreferences.Editor habit_editor = habit_log.edit();
@@ -418,7 +457,7 @@ public class MainActivity extends AppCompatActivity {
                     saveHabitMap(habitMap);
                 }
 
-                Toast.makeText(MainActivity.this, habitText+" has been deleted.",
+                Toast.makeText(MainActivity.this, habitText+getResources().getString(R.string.txt_delted),
                         Toast.LENGTH_LONG).show();
 
                 habit_editor.apply();
@@ -429,7 +468,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(getResources().getString(R.string.btn_cancel), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
             }
         });
