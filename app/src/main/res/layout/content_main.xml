@@ -13,12 +13,11 @@
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_alignParentTop="true"
         ads:adSize="SMART_BANNER"
         ads:adUnitId="@string/banner_ad_unit_id">
     </com.google.android.gms.ads.AdView>
-
 
     <android.support.design.widget.TabLayout
         android:id="@+id/tabs"
@@ -38,7 +37,9 @@
         <android.support.constraint.ConstraintLayout
             android:id="@+id/content_main"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingBottom="16dp"
+            android:clipToPadding="false">
 
             <android.support.v4.view.ViewPager
                 xmlns:android="http://schemas.android.com/apk/res/android"
@@ -49,24 +50,36 @@
                 app:layout_constraintTop_toTopOf="parent"/>
 
             <View
+                android:id="@+id/line_view"
                 android:layout_width="0dp"
                 android:layout_height="1dp"
-                android:background="@android:color/darker_gray"
-                app:layout_constraintTop_toBottomOf="@+id/pager"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
+                android:background="@color/colorPrimaryDark"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginEnd="8dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginStart="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginEnd="8dp"/>
+                app:layout_constraintTop_toBottomOf="@+id/pager"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"/>
+
+            <com.google.android.gms.ads.NativeExpressAdView
+                android:id="@+id/nativeAdView"
+                app:layout_constraintTop_toBottomOf="@+id/line_view"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_marginTop="8dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                ads:adUnitId="@string/native_ad_unit_id"
+                ads:adSize="320x150"/>
 
             <android.support.v7.widget.CardView
-                android:id="@+id/android_card_view_example"
-                android:layout_width="match_parent"
+                android:id="@+id/motivation_view"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
                 android:layout_margin="16dp"
-                app:layout_constraintTop_toBottomOf="@+id/pager"
+                app:layout_constraintTop_toBottomOf="@+id/nativeAdView"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 >
@@ -75,10 +88,8 @@
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/motivation_view"
                     android:padding="10dp"
-                    android:elevation="4dp"
-                    android:background="@color/colorPrimaryLight"
+                    android:elevation="3dp"
                     >
 
                     <LinearLayout
@@ -88,7 +99,7 @@
                         <TextView
                             android:id="@+id/textView_motivation"
                             android:text="@string/motivation_default"
-                            style="@style/B18TextViewStyle"
+                            style="@style/N18TextViewStyle"
                             android:layout_width="0dp"
                             android:layout_weight="1"
                             android:layout_height="wrap_content"
@@ -120,71 +131,67 @@
                 </LinearLayout>
             </android.support.v7.widget.CardView>
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:background="@android:color/darker_gray"
-                app:layout_constraintTop_toBottomOf="@+id/android_card_view_example"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginTop="16dp"/>
-
-            <GridLayout
+            <android.support.v7.widget.CardView
                 android:id="@+id/stats_grid"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:columnCount="2"
-                app:layout_constraintTop_toBottomOf="@+id/android_card_view_example"
-                app:layout_constraintLeft_toLeftOf="parent"
-                android:layout_marginLeft="16dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="32dp">
-
-                <TextView
-                    android:text="@string/txt_success_rate"
-                    style="@style/B18TextViewStyle"
-                    android:layout_margin="2dp"/>
-                <TextView
-                    android:id="@+id/textViewSuccessRate"
-                    style="@style/B18TextViewStyle"
-                    android:text="@string/txt_0_percent"
-                    android:layout_margin="2dp"/>
-                <TextView
-                    android:text="@string/txt_current_streak"
-                    style="@style/B18TextViewStyle"
-                    android:layout_margin="2dp"/>
-                <TextView
-                    android:id="@+id/textViewCurrentStreak"
-                    style="@style/B18TextViewStyle"
-                    android:text="@string/txt_0"
-                    android:layout_margin="2dp"/>
-                <TextView
-                    android:text="@string/txt_longest_streak"
-                    style="@style/B18TextViewStyle"
-                    android:layout_margin="2dp"/>
-                <TextView
-                    android:id="@+id/textViewLongestStreak"
-                    style="@style/B18TextViewStyle"
-                    android:text="@string/txt_0"
-                    android:layout_margin="2dp"/>
-            </GridLayout>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:background="@android:color/darker_gray"
-                app:layout_constraintTop_toBottomOf="@+id/stats_grid"
+                android:layout_margin="16dp"
+                app:layout_constraintTop_toBottomOf="@+id/motivation_view"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginTop="16dp"/>
+                >
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:elevation="3dp"
+                    >
+
+                    <TextView
+                        android:id="@+id/textView_progress_report"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/txt_progress_report"
+                        style="@style/B18TextViewStyle"
+                        android:layout_marginBottom="8dp"/>
+
+                    <GridLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:columnCount="2">
+
+                        <TextView
+                            android:text="@string/txt_success_rate"
+                            style="@style/N18TextViewStyle"
+                            android:layout_margin="2dp"/>
+                        <TextView
+                            android:id="@+id/textViewSuccessRate"
+                            style="@style/N18TextViewStyle"
+                            android:text="@string/txt_0_percent"
+                            android:layout_margin="2dp"/>
+                        <TextView
+                            android:text="@string/txt_current_streak"
+                            style="@style/N18TextViewStyle"
+                            android:layout_margin="2dp"/>
+                        <TextView
+                            android:id="@+id/textViewCurrentStreak"
+                            style="@style/N18TextViewStyle"
+                            android:text="@string/txt_0"
+                            android:layout_margin="2dp"/>
+                        <TextView
+                            android:text="@string/txt_longest_streak"
+                            style="@style/N18TextViewStyle"
+                            android:layout_margin="2dp"/>
+                        <TextView
+                            android:id="@+id/textViewLongestStreak"
+                            style="@style/N18TextViewStyle"
+                            android:text="@string/txt_0"
+                            android:layout_margin="2dp"/>
+                    </GridLayout>
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
 
         </android.support.constraint.ConstraintLayout>
     </ScrollView>

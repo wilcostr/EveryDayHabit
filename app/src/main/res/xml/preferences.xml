@@ -1,65 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory
-        android:title="@string/preference_category_general"
-        android:key="preference_category_general">
-        <Preference android:layout="@layout/preferences_divider"/>
-        <SwitchPreference
-            android:defaultValue="true"
-            android:title="@string/preference_notifications"
-            android:key="switch_preference_notification" />
-        <RingtonePreference
-            android:key="ringtone_preference"
-            android:ringtoneType="notification"
-            android:title="@string/preference_notification_tone" />
-        <SwitchPreference
-            android:defaultValue="true"
-            android:title="@string/preference_accept_excuses"
-            android:key="switch_preference_legit"
-            android:summaryOn="@string/preference_excuses_summary_on"
-            android:summaryOff="@string/preference_excuses_summary_off"/>
-        <Preference
-            android:key="simple_text_about"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:title="@string/preference_about"
-            android:summary="0"/>
 
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:title="@string/preference_category_specific"
-        android:key="preference_category_specific">
-        <Preference android:layout="@layout/preferences_divider"/>
-        <EditTextPreference
-            android:defaultValue="@string/default_habit_text"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:title="@string/preference_description"
-            android:key="edit_text_preference_habit_text"
-            android:summary="@string/default_habit_text" />
-
-        <EditTextPreference
-            android:defaultValue="@string/default_habit_word"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:title="@string/preference_summary"
-            android:key="edit_text_preference_habit_summary"
-            android:summary="@string/default_habit_word" />
-
-        <Preference
-            android:key="time_picker_preference_notification"
-            android:summary="18:00"
-            android:title="@string/preference_notification_time" />
-
-        <Preference
-            android:key="simple_text_habit_date"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:title="@string/preference_start_date"
-            android:summary="NaN"/>
-
-    </PreferenceCategory>
+    <SwitchPreference
+        android:defaultValue="true"
+        android:title="@string/preference_notifications"
+        android:key="switch_preference_notification" />
+    <RingtonePreference
+        android:key="ringtone_preference"
+        android:ringtoneType="notification"
+        android:title="@string/preference_notification_tone" />
+    <SwitchPreference
+        android:defaultValue="true"
+        android:title="@string/preference_accept_excuses"
+        android:key="switch_preference_legit"
+        android:summaryOn="@string/preference_excuses_summary_on"
+        android:summaryOff="@string/preference_excuses_summary_off"/>
+    <Preference
+        android:key="simple_text_about"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/preference_about"
+        android:summary="0"/>
 
 </PreferenceScreen>

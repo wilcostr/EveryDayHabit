@@ -7,4 +7,5 @@
     <dimen name="grid_height">320dp</dimen>
     <dimen name="fragment_height">370dp</dimen>
     <dimen name="fragment_height_extended">390dp</dimen>
+    <dimen name="fragment_height_button">280dp</dimen>
 </resources>

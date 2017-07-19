@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -9,14 +10,29 @@
         android:id="@+id/textView_swipe"
         android:text="@string/txt_new_habit"
         style="@style/B18TextViewStyle"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_centerHorizontal="true"
         android:layout_height="wrap_content"
         android:textAlignment="center"
-        android:padding="16dp"/>
+        android:paddingTop="16dp"
+        android:paddingBottom="10dp"/>
+
+    <ImageButton
+        android:id="@+id/button_edit"
+        android:contentDescription="@string/action_edit_habit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:padding="16dp"
+        android:src="@drawable/button_edit"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:onClick="onButtonEditClick" />
 
     <GridView
         android:id="@+id/content_grid"
         android:layout_width="match_parent"
+        android:layout_below="@id/textView_swipe"
         android:layout_height="@dimen/grid_height"
         android:numColumns="7"
         android:verticalSpacing="12dp"
@@ -25,13 +41,14 @@
 
     <ImageButton
         android:id="@+id/button_new_habit"
+        android:layout_below="@id/textView_swipe"
         android:contentDescription="@string/txt_add_new_habit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_centerInParent="true"
         android:layout_marginTop="40dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/button_add"
         android:visibility="gone" />
 
-</LinearLayout>
+</RelativeLayout>

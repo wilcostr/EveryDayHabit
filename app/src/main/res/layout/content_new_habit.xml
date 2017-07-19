@@ -42,7 +42,6 @@
             android:layout_height="wrap_content"
             android:inputType="textCapSentences"
             android:ems="10"
-            android:background="#DDD"
             android:id="@+id/editTextHabit"
             android:hint="@string/new_habit_prompt"
             android:padding="10dp"

@@ -57,6 +57,9 @@ public class PageFragment extends Fragment {
             ImageButton newHabitButton = (ImageButton) view.findViewById(R.id.button_new_habit);
             newHabitButton.setVisibility(View.VISIBLE);
 
+            ImageButton editHabitButton = (ImageButton) view.findViewById(R.id.button_edit);
+            editHabitButton.setVisibility(View.GONE);
+
             newHabitButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -102,7 +105,7 @@ public class PageFragment extends Fragment {
                 }
                 else if (position == numDays+1) {
                     // Clicked on tomorrow
-                    Toast.makeText(getContext(), "Cannot edit tomorrow's entry", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), getString(R.string.txt_cannot_tomorrow), Toast.LENGTH_SHORT).show();
                 }
                 else if (position <= numDays) {
                     // Clicked on an old entry

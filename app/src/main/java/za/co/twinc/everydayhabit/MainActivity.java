@@ -22,7 +22,11 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.SpannedString;
 import android.text.format.DateFormat;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,7 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.NativeExpressAdView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -53,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int NEW_HABIT_REQUEST       = 2;
     private final int       SETTINGS_REQUEST        = 3;
     private final int       CONGRATULATE_REQUEST    = 4;
+    private final int       EDIT_HABIT_REQUEST      = 5;
 
     private int current_habit;
 
@@ -68,6 +73,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Load default settings values.
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+
+        // Create main share preference log
         SharedPreferences main_log = getSharedPreferences(MAIN_PREFS, 0);
 
         // Try to get intent that opened main (only the case when opened from notification)
@@ -161,12 +170,29 @@ public class MainActivity extends AppCompatActivity {
         textViewLongestStreak = (TextView) findViewById(R.id.textViewLongestStreak);
         displayHabitContent();
 
-        //MobileAds.initialize(getApplicationContext(),"ca-app-pub-5782047288878600~9640464773");
-        AdView mAdView = (AdView) findViewById(R.id.adView);
+        // Home banner
+        // AdView adView = (AdView) findViewById(R.id.adView);
+
+        // Native AdView
+        NativeExpressAdView adView = (NativeExpressAdView)findViewById(R.id.nativeAdView);
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice("5F2995EE0A8305DEB4C48C77461A7362")
                 .build();
-        mAdView.loadAd(adRequest);
+        adView.loadAd(adRequest);
+
+        // Shorten and simplify the display if no habits have been added
+        if (getIntFromPrefs(MAIN_PREFS, "num_habits", 0) == 0) {
+            viewPager.setLayoutParams(new ConstraintLayout.LayoutParams(
+                    ConstraintLayout.LayoutParams.MATCH_PARENT,
+                    (int) getResources().getDimension(R.dimen.fragment_height_button)));
+
+            // Also hide the ad before the user has added a habit
+            adView.setVisibility(View.GONE);
+
+            // Also hide habit stats
+            CardView cardView = (CardView)findViewById(R.id.stats_grid);
+            cardView.setVisibility(View.GONE);
+        }
 
         //Initialise and load motivation text
         textViewMotivation = (TextView) findViewById(R.id.textView_motivation);
@@ -179,6 +205,12 @@ public class MainActivity extends AppCompatActivity {
     private void displayHabitContent(){
         int streak_longest = 0, streak_current = 0, days_fail = 0;
         int days_fail_legit = 0, days_success = 0;
+
+        String habit_summary = getStringFromPrefs(HABIT_PREFS + current_habit, "habit_summary",
+                getString(R.string.txt_habit));
+        habit_summary = habit_summary.substring(0, 1).toUpperCase() + habit_summary.substring(1);
+        TextView textViewProgressReport = (TextView) findViewById(R.id.textView_progress_report);
+        textViewProgressReport.setText(getString(R.string.txt_progress_report,habit_summary));
 
         if (current_habit != -1) {
             SharedPreferences habit_log = getSharedPreferences(HABIT_PREFS + current_habit, 0);
@@ -259,18 +291,6 @@ public class MainActivity extends AppCompatActivity {
         switch (id){
             case R.id.action_settings:
                 Intent startSettings = new Intent(getApplicationContext(), SettingsActivity.class);
-                startSettings.putExtra("habit_text",
-                        getStringFromPrefs(HABIT_PREFS+current_habit,"habit","Habit"));
-                startSettings.putExtra("habit_summary",
-                        getStringFromPrefs(HABIT_PREFS+current_habit,"habit_summary","Habit"));
-                startSettings.putExtra("habit_time",
-                        getIntFromPrefs(HABIT_PREFS+current_habit,"notify",8));
-
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTimeInMillis(getDateFromPrefs(HABIT_PREFS+current_habit));
-                String dateString = DateFormat.getDateFormat(this).format(calendar.getTime());
-                startSettings.putExtra("habit_date", dateString);
-
                 startActivityForResult(startSettings, SETTINGS_REQUEST);
                 return true;
             case R.id.action_new_habit:
@@ -279,6 +299,9 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.action_delete_habit:
                 deleteHabit();
+                return true;
+            case R.id.action_edit_habit:
+                editHabit();
                 return true;
             case R.id.action_start:
                 Intent intent = new Intent(getApplicationContext(), FirstUseActivity.class);
@@ -331,7 +354,9 @@ public class MainActivity extends AppCompatActivity {
     public void onButtonShareMotivationClick(View view){
         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
-        String shareText = (String)textViewMotivation.getText();
+        SpannedString str = (SpannedString) textViewMotivation.getText();
+        String shareText = str.toString();
+                //String shareText = (String)textViewMotivation.getText();
         sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareText);
 
         if (Build.VERSION.SDK_INT >= 22) {
@@ -352,6 +377,30 @@ public class MainActivity extends AppCompatActivity {
                     getResources().getText(R.string.motivation_share)));
             Toast.makeText(this, getResources().getString(R.string.motivation_copied), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @SuppressWarnings("UnusedParameters")
+    public void onButtonEditClick(View view){
+        editHabit();
+    }
+
+    private void editHabit(){
+        // Can't edit the add new habit button
+        if (current_habit == -1) return;
+
+        Intent editHabit = new Intent(getApplicationContext(), HabitSettings.class);
+        editHabit.putExtra("habit_text",
+                getStringFromPrefs(HABIT_PREFS+current_habit,"habit","Habit"));
+        editHabit.putExtra("habit_summary",
+                getStringFromPrefs(HABIT_PREFS+current_habit,"habit_summary","Habit"));
+        editHabit.putExtra("habit_time",
+                getIntFromPrefs(HABIT_PREFS+current_habit,"notify",8));
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(getDateFromPrefs(HABIT_PREFS+current_habit));
+        String dateString = DateFormat.getDateFormat(this).format(calendar.getTime());
+        editHabit.putExtra("habit_date", dateString);
+        startActivityForResult(editHabit, EDIT_HABIT_REQUEST);
     }
 
     private void feedback(){
@@ -522,7 +571,12 @@ public class MainActivity extends AppCompatActivity {
         // Make sure the request was successful
         if (resultCode == RESULT_OK) {
             // Check which request we're responding to
-            if (requestCode == SETTINGS_REQUEST) {
+
+            if (requestCode == SETTINGS_REQUEST){
+                // Legit preference could have changed. Update habit display.
+                displayHabitContent();
+            }
+            else if (requestCode == EDIT_HABIT_REQUEST){
                 SharedPreferences habit_log = getSharedPreferences(HABIT_PREFS+current_habit, 0);
                 SharedPreferences.Editor habit_editor = habit_log.edit();
                 habit_editor.putString("habit", data.getStringExtra("habit_text"));
@@ -568,6 +622,12 @@ public class MainActivity extends AppCompatActivity {
                 int num_habits = main_log.getInt("num_habits",0);
                 int next_habit = main_log.getInt("next_habit",0);
 
+                // If this was the first habit added, fix the viewPager height here
+                if (num_habits == 0)
+                    viewPager.setLayoutParams(new ConstraintLayout.LayoutParams(
+                            ConstraintLayout.LayoutParams.MATCH_PARENT,
+                            (int) getResources().getDimension(R.dimen.fragment_height)));
+
                 // Create shared preference log for new habit
                 SharedPreferences habit_log = getSharedPreferences(HABIT_PREFS+next_habit, 0);
                 SharedPreferences.Editor habit_editor = habit_log.edit();
@@ -600,7 +660,7 @@ public class MainActivity extends AppCompatActivity {
                 viewPager.setCurrentItem(num_habits);
 
                 // Set notification
-                setHabitNotification(next_habit);
+                setHabitNotification(current_habit);
                 // Activate boot receiver if this is the first habit added
                 if (num_habits==0) alarmReceiver.setBootReceiver(getApplicationContext());
             }
@@ -618,12 +678,12 @@ public class MainActivity extends AppCompatActivity {
     private static void setHabitNotification(Context ctx, int habitNum){
         // Return if Notifications switched off in settings
         SharedPreferences settingsPref = PreferenceManager.getDefaultSharedPreferences(ctx);
-        boolean notify = settingsPref.getBoolean(SettingsActivity.KEY_PREF_NOTIFICATION_SWITCH, false);
+        boolean notify = settingsPref.getBoolean(SettingsActivity.KEY_PREF_NOTIFICATION_SWITCH, true);
         if (!notify)
             return;
 
         String habitText = getStringFromPrefs(ctx, HABIT_PREFS+habitNum,"habit","perform your habit");
-        int habitTime = getIntFromPrefs(ctx, HABIT_PREFS+habitNum,"notify",18*60);
+        int habitTime = getIntFromPrefs(ctx, HABIT_PREFS+habitNum,"notify",21*60+25);
 
         // Add a day if the notification time is already passed today
         Calendar cal = Calendar.getInstance();
@@ -705,8 +765,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            if (s != null)
-                textViewMotivation.setText(s.replace("(","\n- ").replace(")",""));
+            if (s != null) {
+                s = s.replace("(","\n- ").replace(")","");
+                SpannableStringBuilder str = new SpannableStringBuilder(s);
+                str.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
+                        s.indexOf('-'), str.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                textViewMotivation.setText(str);
+            }
         }
     }
 

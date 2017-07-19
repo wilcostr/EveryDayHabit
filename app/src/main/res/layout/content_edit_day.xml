@@ -65,7 +65,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/textView2"
-            style="@style/B18TextViewStyle"
+            style="@style/N18TextViewStyle"
             android:layout_marginTop="27dp"
             android:layout_below="@id/radio_edit_day"/>
 
@@ -80,7 +80,6 @@
             android:layout_marginTop="26dp"
             android:id="@+id/editText"
             android:gravity="start"
-            android:background="#DDD"
             android:selectAllOnFocus="false"
             android:hint="@string/edit_day_log_comment"
             android:padding="10dp" />

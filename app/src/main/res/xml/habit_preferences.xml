@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference
+        android:defaultValue="@string/default_habit_text"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/preference_description"
+        android:key="edit_text_preference_habit_text"
+        android:summary="@string/default_habit_text" />
+
+    <EditTextPreference
+        android:defaultValue="@string/default_habit_word"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/preference_summary"
+        android:key="edit_text_preference_habit_summary"
+        android:summary="@string/default_habit_word" />
+
+    <Preference
+        android:key="time_picker_preference_notification"
+        android:summary="18:00"
+        android:title="@string/preference_notification_time" />
+
+    <Preference
+        android:key="simple_text_habit_date"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/preference_start_date"
+        android:summary="NaN"/>
+
+</PreferenceScreen>

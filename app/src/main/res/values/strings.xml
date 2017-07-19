@@ -1,12 +1,17 @@
 <resources>
     <string name="app_name">EveryDayHabit</string>
 
+    <string name="banner_ad_unit_id">ca-app-pub-5782047288878600/6628122771</string>
+    <string name="native_ad_unit_id">ca-app-pub-5782047288878600/9611043170</string>
+
     <string name="action_settings">Settings</string>
     <string name="action_new_habit">New Habit</string>
     <string name="action_startup_info">Info</string>
     <string name="action_feedback">Feedback</string>
+    <string name="action_delete_habit">Delete Habit</string>
+    <string name="action_edit_habit">Edit Habit</string>
 
-    <string name="edit_day_activity_title">Habit Progress Report</string>
+    <string name="edit_day_activity_title">Daily Progress</string>
     <string name="edit_day_default">Did you have a successful day?</string>
     <string name="edit_day_did_you">"Did you "</string>
     <string name="edit_day_today">" today?"</string>
@@ -20,8 +25,6 @@
     <string name="edit_day_log_comment">Log your comments</string>
     <string name="edit_day_legit">My reason is legitimate</string>
     <string name="edit_day_button">Done</string>
-
-    <string name="banner_ad_unit_id">ca-app-pub-5782047288878600/6628122771</string>
 
     <string name="new_habit_activity_title">New Habit</string>
     <string name="new_habit_1">Let\'s start a new habit!\n
@@ -42,11 +45,7 @@
     <string name="new_habit_prompt">Enter simple daily action</string>
     <string name="new_habit_button">Add Habit</string>
 
-    <string name="delete_habit">Delete Habit</string>
-
-    <string name="preference_category_general">General Settings</string>
     <string name="preference_notifications">Notifications</string>
-    <string name="preference_category_specific">Habit Settings</string>
     <string name="preference_accept_excuses">Accept Legitimate Excuses</string>
     <string name="preference_excuses_summary_on">Legitimate excuses will not break streaks</string>
     <string name="preference_excuses_summary_off">Legitimate excuses are considered missed days
@@ -70,23 +69,25 @@
     <string name="txt_new_habit">New Habit</string>
     <string name="txt_add_new_habit">Add New Habit</string>
     <string name="txt_no_reason">You didn\'t log a reason</string>
+    <string name="txt_cannot_tomorrow">"Cannot edit tomorrow\'s entry"</string>
     <string name="txt_no_log">No progress logged</string>
     <string name="txt_no_comment">No comment</string>
     <string name="txt_success_rate">"Success Rate: "</string>
     <string name="txt_current_streak">"Current Streak: "</string>
     <string name="txt_longest_streak">"Longest Streak: "</string>
+    <string name="txt_progress_report">"%s progress report"</string>
     <string name="txt_0_percent">0%</string>
     <string name="txt_0">0</string>
     <string name="txt_delete">"Delete: "</string>
     <string name="txt_delted">" has been deleted."</string>
     <string name="txt_no_email">No email application found</string>
 
-    <string name="btn_delete">DELETE</string>
-    <string name="btn_cancel">CANCEL</string>
-    <string name="btn_rate_app">RATE APP</string>
-    <string name="btn_contact_us">CONTACT US</string>
+    <string name="btn_delete">Delete</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_rate_app">Rate App</string>
+    <string name="btn_contact_us">Contact us</string>
 
-    <string name="feedback_title">Give feedback</string>
+    <string name="feedback_title">Give Feedback</string>
     <string name="feedback_msg">We would appreciate any feedback, feature requests or bug reports.\n
         \nPlease consider leaving a review on Google Play if you enjoy using EveryDayHabit.
     </string>
@@ -94,31 +95,22 @@
     <string name="first_use_activity_title">EveryDayHabit</string>
     <string name="first_use_button">Let\'s Get Started</string>
     <string name="first_use_text">Welcome to EveryDayHabit.\n
-        \nHabits are powerful mini auto-pilot scripts that kick in with very specific triggers.
-        They free up our mental capacity by essentially removing the need to make active decisions
-        or to respond to stimuli while the habit script is running. Habits are not only executed
-        automatically, but are also formed automatically, with our brains constantly searching for
-        behavioural patterns to automate in order to optimise our day to day lives.
-        This might make habits hard to break, but luckily makes it fairly straight forward
-        to form new positive habits.\n
 
-        \nTo achieve your ultimate goal will require effort and perseverance, but to establish a
-        relevant micro habit to get you started does not. By breaking the steps down into the
-        simplest possible daily activity that would take very little time and physical effort to
-        complete, habit formation is a walk in the park.\n
+        \nHabits free up our mental capacity and energy by removing the need to make active
+        decisions while performing habitual tasks. We can use the fact that our brains are
+        constantly searching for behavioural patterns that can be automated to greatly improve
+        our lives.\n
 
-        \nEvery habit starts with a trigger. The easiest way to approach the formation of a new
-        habit is to piggyback it on another habitual daily activity.
-        Another option is to use the trigger of a bad habit and substitute your
-        new positive behaviour. If you do this, make sure that the new habit has a similar <i>reward</i>
-        to the bad habit you are replacing.\n
+        \nTo achieve your life goals will require effort and perseverance, but to establish relevant
+        micro habits to get you started does not. By breaking things down into the simplest possible
+        daily activity that would take very little time and physical effort to complete, habit
+        formation can be easy.\n
 
-        \nWith EveryDayHabit there are also no Mondays and no first-of-the-months,
-        only the very next day. Your habit starts right now.\n
+        \nFocus on the basics of habit creation: Make the activity simple, keep the trigger
+        and reward consistent, and do it every day.\n
 
-        \nThere are many great resources out there on habit formation and the powerful impact
-        habits have on our lives, but these are the basics you need to get started. Make it simple,
-        keep the trigger and reward consistent, and do it every day!
+        \nHabits do not wait for Mondays or the first-of-the-months; all that matters is today.
+        Your habit starts right now!
     </string>
     <string name="first_use_reminder">Start a micro-habit today!</string>
 

@@ -12,13 +12,17 @@
     <item
         android:id="@+id/action_delete_habit"
         android:orderInCategory="103"
-        android:title="@string/delete_habit"/>
+        android:title="@string/action_delete_habit"/>
+    <item
+        android:id="@+id/action_edit_habit"
+        android:orderInCategory="104"
+        android:title="@string/action_edit_habit"/>
     <item
         android:id="@+id/action_start"
-        android:orderInCategory="104"
+        android:orderInCategory="105"
         android:title="@string/action_startup_info"/>
     <item
         android:id="@+id/action_feedback"
-        android:orderInCategory="105"
+        android:orderInCategory="106"
         android:title="@string/action_feedback" />
 </menu>

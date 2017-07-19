@@ -27,7 +27,10 @@
             android:name=".SettingsActivity"
             android:label="@string/action_settings"
             android:theme="@style/AppTheme" />
-
+        <activity
+            android:name=".HabitSettings"
+            android:label="@string/action_edit_habit"
+            android:theme="@style/AppTheme"/>
         <activity
             android:name=".EditDayActivity"
             android:label="@string/edit_day_activity_title"
