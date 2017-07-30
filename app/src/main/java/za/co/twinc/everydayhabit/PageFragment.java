@@ -182,7 +182,7 @@ public class PageFragment extends Fragment {
         for (int i = 0; i < NUM_LOG_ENTRIES; i++) {
             log_entries[i] = habit_log.getInt("log_entry_" + (i + offset), -1);
             if (log_entries[i] == -1 && i < numDays)
-                log_entries[i] = 1;             // Assume failure with no report
+                log_entries[i] = 3;             // Assume failure with no report
         }
 
         // Initialise gridContent with latest log_entries

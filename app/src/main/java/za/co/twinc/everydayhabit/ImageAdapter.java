@@ -1,7 +1,10 @@
 package za.co.twinc.everydayhabit;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +29,7 @@ class ImageAdapter extends BaseAdapter {
         mContext = c;
         items = log_items;
         offset = habit_offset;
-        ticks = new int[]{R.drawable.tick_green, R.drawable.tick_red, R.drawable.tick_orange};
+        ticks = new int[]{R.drawable.tick_green, R.drawable.tick_red, R.drawable.tick_orange, android.R.drawable.ic_menu_help};
     }
 
     public int getCount() {
@@ -52,6 +55,8 @@ class ImageAdapter extends BaseAdapter {
 
             if (items[position] >= 0){
                 textV.setBackgroundResource(ticks[items[position]]);
+                if (items[position]==3 && Build.VERSION.SDK_INT >= 21)
+                    textV.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#000000")));
             }
             else{
                 textV.setText(String.format(Locale.UK, "%d", position + 1 + offset));

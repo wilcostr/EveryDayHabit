@@ -28,13 +28,11 @@
 
     <string name="new_habit_activity_title">New Habit</string>
     <string name="new_habit_1">Let\'s start a new habit!\n
-        \nGood habits serve to create routine, order and efficiency and bad habits can lock us into
-        negative patterns of behaviour.\n
         \nMaking or breaking a habit takes conscious mental effort and perseverance, but the
-        pay off can be massive. Think what it is that you want to achieve, reduce it to the
+        pay off can be massive.\n
+        \nThink what it is that you want to achieve, reduce it to the
         simplest possible daily activity that would take very little time and physical effort to
-        complete. Now think of something in your daily routine that can act as a trigger for
-        performing your new habit and complete the following:\n
+        complete. Now complete the following sentence:\n
     </string>
     <string name="new_habit_2">Every day, I am going to…\n</string>
     <string name="new_habit_notify_title">Notification Time</string>
@@ -83,7 +81,6 @@
     <string name="txt_no_email">No email application found</string>
 
     <string name="btn_delete">Delete</string>
-    <string name="btn_cancel">Cancel</string>
     <string name="btn_rate_app">Rate App</string>
     <string name="btn_contact_us">Contact us</string>
 

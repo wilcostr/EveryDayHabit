@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
     private SwipeAdapter swipeAdapter;
     private ViewPager viewPager;
+    private NativeExpressAdView adView;
     private static AlarmReceiver alarmReceiver;
 
     @Override
@@ -174,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
         // AdView adView = (AdView) findViewById(R.id.adView);
 
         // Native AdView
-        NativeExpressAdView adView = (NativeExpressAdView)findViewById(R.id.nativeAdView);
+        adView = (NativeExpressAdView)findViewById(R.id.nativeAdView);
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice("5F2995EE0A8305DEB4C48C77461A7362")
                 .build();
@@ -226,15 +227,22 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i <= numDays; i++) {
                 int log_entry = habit_log.getInt("log_entry_" + i, -1);
 
+                // Check and correct log for no progress reported
+                if (log_entry == 1){
+                    String reason = habit_log.getString("log_reason_" + i,getString(R.string.txt_no_reason));
+                    if (reason.equals(getString(R.string.txt_no_log)))
+                        log_entry = -1;
+                }
+
                 if (log_entry == -1 && i < numDays) {
-                    log_entry = 1;             // Assume failure with no report
+                    log_entry = 3;             // Assume failure with no report
                     habit_editor.putString("log_reason_" + i, getString(R.string.txt_no_log));
-                    habit_editor.putInt("log_entry_" + i, 1);
+                    habit_editor.putInt("log_entry_" + i, log_entry);
                 }
                 if (log_entry == 0) {          // Successful day
                     days_success++;
                     streak_current++;
-                } else if (log_entry == 1) {      // Failure with no legit reason
+                } else if (log_entry == 1 || log_entry == 3) {      // Failure with no legit reason
                     days_fail++;
                     streak_current = 0;
                 } else if (log_entry == 2) {      // Failure with legit reason
@@ -427,7 +435,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-        builder.setNegativeButton(getResources().getString(R.string.btn_cancel), new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
 
             }
@@ -469,7 +477,7 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(getResources().getString(R.string.txt_delete) + habitText);
 
-        builder.setPositiveButton(getResources().getString(R.string.btn_delete), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(getString(R.string.btn_delete), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
 
                 // Remove notification
@@ -517,7 +525,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        builder.setNegativeButton(getResources().getString(R.string.btn_cancel), new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
             }
         });
@@ -623,10 +631,13 @@ public class MainActivity extends AppCompatActivity {
                 int next_habit = main_log.getInt("next_habit",0);
 
                 // If this was the first habit added, fix the viewPager height here
-                if (num_habits == 0)
+                if (num_habits == 0) {
                     viewPager.setLayoutParams(new ConstraintLayout.LayoutParams(
                             ConstraintLayout.LayoutParams.MATCH_PARENT,
                             (int) getResources().getDimension(R.dimen.fragment_height)));
+
+                    adView.setVisibility(View.VISIBLE);
+                }
 
                 // Create shared preference log for new habit
                 SharedPreferences habit_log = getSharedPreferences(HABIT_PREFS+next_habit, 0);
@@ -768,8 +779,10 @@ public class MainActivity extends AppCompatActivity {
             if (s != null) {
                 s = s.replace("(","\n- ").replace(")","");
                 SpannableStringBuilder str = new SpannableStringBuilder(s);
-                str.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
-                        s.indexOf('-'), str.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                int separatorIdx = s.indexOf('-');
+                if (separatorIdx > -1)
+                    str.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
+                            s.indexOf('-'), str.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 textViewMotivation.setText(str);
             }
         }
