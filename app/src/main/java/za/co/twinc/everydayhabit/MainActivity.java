@@ -9,6 +9,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -25,15 +27,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.SpannedString;
 import android.text.format.DateFormat;
+import android.text.style.RelativeSizeSpan;
+import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetView;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.NativeExpressAdView;
 
@@ -64,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView textViewSuccessRate, textViewCurrentStreak, textViewLongestStreak;
     private TextView textViewMotivation;
 
+    private Menu myOptionsMenu;
     private SwipeAdapter swipeAdapter;
     private ViewPager viewPager;
     private NativeExpressAdView adView;
@@ -175,11 +183,12 @@ public class MainActivity extends AppCompatActivity {
         // AdView adView = (AdView) findViewById(R.id.adView);
 
         // Native AdView
-        adView = (NativeExpressAdView)findViewById(R.id.nativeAdView);
+        adView = (NativeExpressAdView) findViewById(R.id.nativeAdView);
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice("5F2995EE0A8305DEB4C48C77461A7362")
                 .build();
         adView.loadAd(adRequest);
+        //adView.setVisibility(View.GONE);
 
         // Shorten and simplify the display if no habits have been added
         if (getIntFromPrefs(MAIN_PREFS, "num_habits", 0) == 0) {
@@ -195,12 +204,68 @@ public class MainActivity extends AppCompatActivity {
             cardView.setVisibility(View.GONE);
         }
 
-        //Initialise and load motivation text
+        // Initialise and load motivation text
         textViewMotivation = (TextView) findViewById(R.id.textView_motivation);
         loadNewMotivation();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // Show settings hint after day 3
+        if (main_log.getBoolean("show_settings_hint",true) &&
+                getIntFromPrefs(HABIT_PREFS+current_habit,"log_entry_2",-1) != -1) {
+            // Only show hint once
+            SharedPreferences.Editor editor = main_log.edit();
+            editor.putBoolean("show_settings_hint",false);
+            editor.apply();
+            TapTargetView.showFor(this,
+                    TapTarget.forToolbarOverflow(toolbar, getString(R.string.settings_tip_title),
+                            getString(R.string.settings_tip_text))
+                    .drawShadow(true),
+                    new TapTargetView.Listener() {          // The listener can listen for regular clicks, long clicks or cancels
+                        @Override
+                        public void onTargetClick(TapTargetView view) {
+                            super.onTargetClick(view);
+
+                            MenuItem menuItem = myOptionsMenu.findItem(R.id.action_settings);
+                            SpannableString s = new SpannableString(menuItem.getTitle().toString());
+                            s.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD), 0, s.length(), 0);
+                            s.setSpan(new RelativeSizeSpan(1.2f), 0, s.length(), 0);
+                            menuItem.setTitle(s);
+                            ((Toolbar) findViewById(R.id.toolbar)).showOverflowMenu();
+                        }
+                    });
+        }
+
+        // Show edit habit hint if at least 7 days completed
+        if (main_log.getBoolean("show_edit_hint",true) &&
+                getIntFromPrefs(HABIT_PREFS+current_habit,"log_entry_6",-1) != -1) {
+            // Only show hint once
+            SharedPreferences.Editor editor = main_log.edit();
+            editor.putBoolean("show_edit_hint",false);
+            editor.apply();
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+            int width = displayMetrics.widthPixels;
+            Drawable editIcon;
+            if (Build.VERSION.SDK_INT < 21)
+                //noinspection deprecation
+                editIcon = getResources().getDrawable(R.drawable.button_edit);
+            else editIcon = getDrawable(R.drawable.button_edit);
+
+            TapTargetView.showFor(this,
+                    TapTarget.forBounds(new Rect(width - 100, 260, width, 360), getString(R.string.edit_tip_title))
+                            .drawShadow(true)
+                            .outerCircleAlpha(0.9f)
+                            .icon(editIcon),
+                    new TapTargetView.Listener() {
+                        @Override
+                        public void onTargetClick(TapTargetView view) {
+                            super.onTargetClick(view);
+                            editHabit();
+                        }
+                    });
+        }
     }
 
     private void displayHabitContent(){
@@ -286,6 +351,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        myOptionsMenu = menu;
         return true;
     }
 
@@ -514,7 +580,7 @@ public class MainActivity extends AppCompatActivity {
                     saveHabitMap(habitMap);
                 }
 
-                Toast.makeText(MainActivity.this, habitText+getResources().getString(R.string.txt_delted),
+                Toast.makeText(MainActivity.this, habitText+getResources().getString(R.string.txt_deleted),
                         Toast.LENGTH_LONG).show();
 
                 habit_editor.apply();
@@ -660,6 +726,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // Show new habit
                 current_habit = next_habit;
+                main_editor.putInt("habit_to_display", current_habit);
 
                 // Update main_log habit counts
                 main_editor.putInt("num_habits", num_habits+1);

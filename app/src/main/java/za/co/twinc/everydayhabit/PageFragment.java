@@ -3,16 +3,21 @@ package za.co.twinc.everydayhabit;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetView;
 
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
@@ -34,9 +39,9 @@ import static za.co.twinc.everydayhabit.MainActivity.habitNumFromIndex;
 
 // Class containing Fragments for swiping through
 public class PageFragment extends Fragment {
-    // TextView in a Fragment to display full habit text
     private GridView gridContent;
     private int habitNum;
+    private boolean showHint = true;
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -84,7 +89,24 @@ public class PageFragment extends Fragment {
             i += 7;
         final int offset = i;
 
-        displayHabitContent(offset);
+        int[] log_entries = new int[NUM_LOG_ENTRIES];
+        SharedPreferences habit_log = getContext().getSharedPreferences(HABIT_PREFS+habitNum, 0);
+
+        long timeDiff = System.currentTimeMillis() - habit_log.getLong("date", 1490000000000L);
+        long numDays =  TimeUnit.DAYS.convert(timeDiff,TimeUnit.MILLISECONDS);
+
+        // Subtract offset from numDays
+        numDays -= offset;
+
+        for (int j = 0; j < NUM_LOG_ENTRIES; j++) {
+            log_entries[j] = habit_log.getInt("log_entry_" + (j + offset), -1);
+            if (log_entries[j] == -1 && j < numDays)
+                log_entries[j] = 3;             // Assume failure with no report
+        }
+
+        // Initialise gridContent with latest log_entries
+        ImageAdapter imageAdapter = new ImageAdapter(getContext(), log_entries, offset);
+        gridContent.setAdapter(imageAdapter);
 
         gridContent.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -152,6 +174,47 @@ public class PageFragment extends Fragment {
                 return true;
             }
         });
+
+        // If this is the first habit, and still no progress logged
+        if ((getIntFromPrefs(getContext(),MAIN_PREFS, "num_habits",-1)==1 ) &&
+                (getIntFromPrefs(getContext(),HABIT_PREFS+habitNum,"log_entry_0",-1) == -1)) {
+            // Listener to pick up when gridContent is done loading layout
+            gridContent.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    // After the layout is loaded add another 1s delay with Handler
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        public void run() {
+                            // Only load one hint
+                            if (showHint) {
+                                TapTargetView.showFor(getActivity(),
+                                        TapTarget.forView(gridContent.getChildAt(0), getString(R.string.day_tip_title),
+                                                getString(R.string.day_tip_text))
+                                        .drawShadow(true),
+                                        new TapTargetView.Listener() {          // The listener can listen for regular clicks, long clicks or cancels
+                                            @Override
+                                            public void onTargetClick(TapTargetView view) {
+                                                super.onTargetClick(view);
+                                                if (getNumDays(0)==-1)
+                                                    Toast.makeText(getContext(), getString(R.string.txt_cannot_tomorrow), Toast.LENGTH_SHORT).show();
+                                                else {
+                                                    // Log progress for first day: Send intent to EditDayActivity
+                                                    Intent editDay = new Intent(getContext(), EditDayActivity.class);
+                                                    editDay.putExtra("clicked_position", 0);
+                                                    editDay.putExtra("habit", getStringFromPrefs(getContext(), HABIT_PREFS + habitNum,
+                                                            "habit", getString(R.string.edit_day_default)));
+                                                    getActivity().startActivityForResult(editDay, EDIT_DAY_REQUEST);
+                                                }
+                                            }
+                                        });
+                                showHint = false;
+                            }
+                        }
+                    }, 1000);
+                }
+            });
+        }
         return view;
     }
 
@@ -167,25 +230,5 @@ public class PageFragment extends Fragment {
         if (timeDiff < 0)
             numDays = -1;
         return (int)numDays;
-    }
-
-    private void displayHabitContent(int offset){
-        int[] log_entries = new int[NUM_LOG_ENTRIES];
-        SharedPreferences habit_log = getContext().getSharedPreferences(HABIT_PREFS+habitNum, 0);
-
-        long timeDiff = System.currentTimeMillis() - habit_log.getLong("date", 1490000000000L);
-        long numDays =  TimeUnit.DAYS.convert(timeDiff,TimeUnit.MILLISECONDS);
-
-        // Subtract offset from numDays
-        numDays -= offset;
-
-        for (int i = 0; i < NUM_LOG_ENTRIES; i++) {
-            log_entries[i] = habit_log.getInt("log_entry_" + (i + offset), -1);
-            if (log_entries[i] == -1 && i < numDays)
-                log_entries[i] = 3;             // Assume failure with no report
-        }
-
-        // Initialise gridContent with latest log_entries
-        gridContent.setAdapter(new ImageAdapter(getContext(), log_entries, offset));
     }
 }

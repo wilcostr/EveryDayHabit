@@ -1,17 +1,17 @@
 <resources>
     <string name="app_name">EveryDayHabit</string>
 
-    <string name="banner_ad_unit_id">ca-app-pub-5782047288878600/6628122771</string>
-    <string name="native_ad_unit_id">ca-app-pub-5782047288878600/9611043170</string>
+    <string name="banner_ad_unit_id" translatable="false">ca-app-pub-5782047288878600/6628122771</string>
+    <string name="native_ad_unit_id" translatable="false">ca-app-pub-5782047288878600/9611043170</string>
 
     <string name="action_settings">Settings</string>
-    <string name="action_new_habit">New Habit</string>
+    <string name="action_new_habit">New habit</string>
     <string name="action_startup_info">Info</string>
     <string name="action_feedback">Feedback</string>
-    <string name="action_delete_habit">Delete Habit</string>
-    <string name="action_edit_habit">Edit Habit</string>
+    <string name="action_delete_habit">Delete habit</string>
+    <string name="action_edit_habit">Edit habit</string>
 
-    <string name="edit_day_activity_title">Daily Progress</string>
+    <string name="edit_day_activity_title">Daily progress</string>
     <string name="edit_day_default">Did you have a successful day?</string>
     <string name="edit_day_did_you">"Did you "</string>
     <string name="edit_day_today">" today?"</string>
@@ -26,7 +26,7 @@
     <string name="edit_day_legit">My reason is legitimate</string>
     <string name="edit_day_button">Done</string>
 
-    <string name="new_habit_activity_title">New Habit</string>
+    <string name="new_habit_activity_title">New habit</string>
     <string name="new_habit_1">Let\'s start a new habit!\n
         \nMaking or breaking a habit takes conscious mental effort and perseverance, but the
         pay off can be massive.\n
@@ -35,62 +35,62 @@
         complete. Now complete the following sentence:\n
     </string>
     <string name="new_habit_2">Every day, I am going to…\n</string>
-    <string name="new_habit_notify_title">Notification Time</string>
+    <string name="new_habit_notify_title">Notification time</string>
     <string name="new_habit_notify">Set a daily reminder to log your progress.
         (Don\'t rely on this as a trigger to perform your habit)\n</string>
     <string name="new_habit_start_today">I\'m starting today</string>
     <string name="new_habit_start_tomorrow">I can only start tomorrow</string>
     <string name="new_habit_prompt">Enter simple daily action</string>
-    <string name="new_habit_button">Add Habit</string>
+    <string name="new_habit_button">Add habit</string>
 
     <string name="preference_notifications">Notifications</string>
-    <string name="preference_accept_excuses">Accept Legitimate Excuses</string>
+    <string name="preference_accept_excuses">Accept legitimate excuses</string>
     <string name="preference_excuses_summary_on">Legitimate excuses will not break streaks</string>
     <string name="preference_excuses_summary_off">Legitimate excuses are considered missed days
         and will break streaks</string>
-    <string name="preference_about">"EveryDayHabit Version"</string>
+    <string name="preference_about">"EveryDayHabit version"</string>
     <string name="preference_description">"Description"</string>
-    <string name="preference_summary">"Tab Text"</string>
-    <string name="preference_notification_time">"Notification Time"</string>
-    <string name="preference_start_date">"Habit Start Date"</string>
-    <string name="preference_notification_tone">Notification Tone</string>
+    <string name="preference_summary">"Tab text"</string>
+    <string name="preference_notification_time">"Notification time"</string>
+    <string name="preference_start_date">"Habit start date"</string>
+    <string name="preference_notification_tone">Notification tone</string>
 
-    <string name="default_habit_text">Default Habit Text</string>
+    <string name="default_habit_text">Default habit text</string>
     <string name="default_habit_word">Habit</string>
 
     <string name="motivation_default">The problems we face either break us, or make us.</string>
-    <string name="motivation_next">Next Motivation</string>
-    <string name="motivation_share">Share Motivation</string>
+    <string name="motivation_next">Next motivation</string>
+    <string name="motivation_share">Share motivation</string>
     <string name="motivation_copied">Motivation copied to clipboard</string>
 
     <string name="txt_habit">Habit</string>
-    <string name="txt_new_habit">New Habit</string>
-    <string name="txt_add_new_habit">Add New Habit</string>
+    <string name="txt_new_habit">New habit</string>
+    <string name="txt_add_new_habit">Add new habit</string>
     <string name="txt_no_reason">You didn\'t log a reason</string>
     <string name="txt_cannot_tomorrow">"Cannot edit tomorrow\'s entry"</string>
     <string name="txt_no_log">No progress logged</string>
     <string name="txt_no_comment">No comment</string>
-    <string name="txt_success_rate">"Success Rate: "</string>
-    <string name="txt_current_streak">"Current Streak: "</string>
-    <string name="txt_longest_streak">"Longest Streak: "</string>
+    <string name="txt_success_rate">"Success rate: "</string>
+    <string name="txt_current_streak">"Current streak: "</string>
+    <string name="txt_longest_streak">"Longest streak: "</string>
     <string name="txt_progress_report">"%s progress report"</string>
-    <string name="txt_0_percent">0%</string>
-    <string name="txt_0">0</string>
+    <string name="txt_0_percent" translatable="false">0%</string>
+    <string name="txt_0" translatable="false">0</string>
     <string name="txt_delete">"Delete: "</string>
-    <string name="txt_delted">" has been deleted."</string>
+    <string name="txt_deleted">" has been deleted"</string>
     <string name="txt_no_email">No email application found</string>
 
     <string name="btn_delete">Delete</string>
-    <string name="btn_rate_app">Rate App</string>
-    <string name="btn_contact_us">Contact us</string>
+    <string name="btn_rate_app">Rate app</string>
+    <string name="btn_contact_us">Email us</string>
 
-    <string name="feedback_title">Give Feedback</string>
+    <string name="feedback_title">Give feedback</string>
     <string name="feedback_msg">We would appreciate any feedback, feature requests or bug reports.\n
         \nPlease consider leaving a review on Google Play if you enjoy using EveryDayHabit.
     </string>
 
-    <string name="first_use_activity_title">EveryDayHabit</string>
-    <string name="first_use_button">Let\'s Get Started</string>
+    <string name="first_use_activity_title" translatable="false">EveryDayHabit</string>
+    <string name="first_use_button">Let\'s get started</string>
     <string name="first_use_text">Welcome to EveryDayHabit.\n
 
         \nHabits free up our mental capacity and energy by removing the need to make active
@@ -119,7 +119,13 @@
         keep tracking your activity with EveryDayHabit. We\'ll shift your grid to display the most
         recent seven weeks only, but your stats will still be based on your progress since day one.
     </string>
-    <string name="congratulations_button">Got It</string>
+    <string name="congratulations_button">Got it</string>
+
+    <string name="day_tip_title">Tap here to log daily progress</string>
+    <string name="day_tip_text">This grid will track your habit building over the next 49 days</string>
+    <string name="settings_tip_title">Set custom app behaviour</string>
+    <string name="settings_tip_text">Change notifications and other app settings</string>
+    <string name="edit_tip_title">Tap here to edit habit</string>
 
 
 </resources>
