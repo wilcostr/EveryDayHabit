@@ -3,17 +3,17 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <SwitchPreference
+        android:key="switch_preference_notification"
         android:defaultValue="true"
-        android:title="@string/preference_notifications"
-        android:key="switch_preference_notification" />
+        android:title="@string/preference_notifications" />
     <RingtonePreference
         android:key="ringtone_preference"
         android:ringtoneType="notification"
         android:title="@string/preference_notification_tone" />
     <SwitchPreference
+        android:key="switch_preference_legit"
         android:defaultValue="true"
         android:title="@string/preference_accept_excuses"
-        android:key="switch_preference_legit"
         android:summaryOn="@string/preference_excuses_summary_on"
         android:summaryOff="@string/preference_excuses_summary_off"/>
     <Preference

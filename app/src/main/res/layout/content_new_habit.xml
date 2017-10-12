@@ -20,65 +20,75 @@
         android:layout_gravity="center_horizontal">
 
         <TextView
+            android:id="@+id/textViewNewHabit"
             android:text="@string/new_habit_1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:id="@+id/textViewNewHabit"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             android:layout_marginTop="0dp" />
 
         <TextView
+            android:id="@+id/textView_every_day"
             android:text="@string/new_habit_2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/textView"
             app:layout_constraintTop_toBottomOf="@id/textViewNewHabit"
             app:layout_constraintLeft_toLeftOf="parent" />
 
         <EditText
+            android:id="@+id/editTextHabit"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:inputType="textCapSentences"
             android:ems="10"
-            android:id="@+id/editTextHabit"
             android:hint="@string/new_habit_prompt"
             android:padding="10dp"
             android:selectAllOnFocus="false"
-            app:layout_constraintTop_toBottomOf="@id/textView"
+            app:layout_constraintTop_toBottomOf="@id/textView_every_day"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"/>
+
+        <Button
+            android:id="@+id/button_suggestions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/editTextHabit"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:onClick="onButtonSuggestionsClick"
+            android:text="@string/suggestions_button"
+            style="?android:attr/borderlessButtonStyle"/>
 
         <RadioGroup
             android:id="@+id/radioGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editTextHabit"
+            app:layout_constraintTop_toBottomOf="@+id/button_suggestions"
             android:layout_marginTop="16dp">
 
             <RadioButton
+                android:id="@+id/radioButtonToday"
                 android:text="@string/new_habit_start_today"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/radioButtonToday"
                 android:layout_weight="1"
                 android:checked="true" />
 
             <RadioButton
+                android:id="@+id/radioButtonTomorrow"
                 android:text="@string/new_habit_start_tomorrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/radioButtonTomorrow"
                 android:layout_weight="1" />
         </RadioGroup>
 
         <Button
+            android:id="@+id/button_add_habit"
             android:text="@string/new_habit_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/button_add_habit"
             android:onClick="onButtonDoneClick"
             app:layout_constraintTop_toBottomOf="@id/radioGroup"
             android:layout_marginTop="16dp"

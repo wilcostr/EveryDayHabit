@@ -36,13 +36,15 @@ import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetView;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.NativeExpressAdView;
+import com.google.android.gms.ads.AdView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -74,7 +76,8 @@ public class MainActivity extends AppCompatActivity {
     private Menu myOptionsMenu;
     private SwipeAdapter swipeAdapter;
     private ViewPager viewPager;
-    private NativeExpressAdView adView;
+    private AdView adView;
+    private Button adButton;
     private static AlarmReceiver alarmReceiver;
 
     @Override
@@ -86,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         // Create main share preference log
-        SharedPreferences main_log = getSharedPreferences(MAIN_PREFS, 0);
+        SharedPreferences mainLog = getSharedPreferences(MAIN_PREFS, 0);
 
         // Try to get intent that opened main (only the case when opened from notification)
         Intent startMainIntent = getIntent();
@@ -104,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (current_habit != -1){
             //Main activity started with intent by habit notification
-            SharedPreferences.Editor editor = main_log.edit();
+            SharedPreferences.Editor editor = mainLog.edit();
             editor.putInt("habit_to_display", current_habit);
             editor.apply();
             // Send intent to EditDayActivity
@@ -116,12 +119,12 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(editDay, EDIT_DAY_REQUEST);
         }
         else{
-            current_habit = main_log.getInt("habit_to_display",0);
+            current_habit = mainLog.getInt("habit_to_display",0);
             // current_habit might still be -1 if we exit the app on the new habit page.
             // In this case we display the first habit in the list.
             if (current_habit == -1){
                 current_habit = habitNumFromIndex(0);
-                SharedPreferences.Editor editor = main_log.edit();
+                SharedPreferences.Editor editor = mainLog.edit();
                 editor.putInt("habit_to_display", current_habit);
                 editor.apply();
             }
@@ -143,11 +146,11 @@ public class MainActivity extends AppCompatActivity {
 
         // ViewPager and adapters use support library fragments, so use getSupportFragmentManager.
         swipeAdapter = new SwipeAdapter(getSupportFragmentManager());
-        viewPager = (ViewPager) findViewById(R.id.pager);
+        viewPager = findViewById(R.id.pager);
         viewPager.setAdapter(swipeAdapter);
         viewPager.setCurrentItem(currentHabitIndex());
 
-        TabLayout tabs = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
 
         // Hack fix: If any habit has a long name we extend the PageFragment height
@@ -163,8 +166,8 @@ public class MainActivity extends AppCompatActivity {
         viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected (int position) {
-                SharedPreferences main_log = getSharedPreferences(MAIN_PREFS, 0);
-                SharedPreferences.Editor editor = main_log.edit();
+                SharedPreferences mainLog = getSharedPreferences(MAIN_PREFS, 0);
+                SharedPreferences.Editor editor = mainLog.edit();
                 int habit_num = habitNumFromIndex(position);
                 editor.putInt("habit_to_display", habit_num);
                 editor.apply();
@@ -174,21 +177,59 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Initialise stats
-        textViewSuccessRate = (TextView) findViewById(R.id.textViewSuccessRate);
-        textViewCurrentStreak = (TextView) findViewById(R.id.textViewCurrentStreak);
-        textViewLongestStreak = (TextView) findViewById(R.id.textViewLongestStreak);
+        textViewSuccessRate = findViewById(R.id.textViewSuccessRate);
+        textViewCurrentStreak = findViewById(R.id.textViewCurrentStreak);
+        textViewLongestStreak = findViewById(R.id.textViewLongestStreak);
         displayHabitContent();
 
-        // Home banner
-        // AdView adView = (AdView) findViewById(R.id.adView);
+        // Initialise the rectangle ad and "why ads" button
+        adView = findViewById(R.id.adViewRect);
+        adButton = findViewById(R.id.why_ads);
+        adButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle(getResources().getString(R.string.ads_title));
+                builder.setMessage(getResources().getString(R.string.ads_msg));
 
-        // Native AdView
-        adView = (NativeExpressAdView) findViewById(R.id.nativeAdView);
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice("5F2995EE0A8305DEB4C48C77461A7362")
-                .build();
-        adView.loadAd(adRequest);
-        //adView.setVisibility(View.GONE);
+                builder.setPositiveButton(R.string.btn_contact_us, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+                        emailIntent.setData(Uri.parse("mailto:dev.twinc@gmail.com?subject=EDH%20premium"));
+
+                        try {
+                            startActivity(emailIntent);
+                        } catch (ActivityNotFoundException e) {
+                            Toast.makeText(MainActivity.this,getResources().getString(R.string.txt_no_email),
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+                builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                builder.create().show();
+            }
+        });
+
+        // Check if premium is not active, then display ad
+        if (mainLog.getLong("premium",0L) - System.currentTimeMillis() < 0){
+            // EDH_banner
+            AdRequest adRequest = new AdRequest.Builder()
+                    .addTestDevice("5F2995EE0A8305DEB4C48C77461A7362")
+                    .build();
+            adView.loadAd(adRequest);
+            adView.setAdListener(new AdListener(){
+                @Override
+                public void onAdLoaded(){
+                    adVisibility(View.VISIBLE);
+                }
+            });
+        }
+        else
+            adVisibility(View.GONE);
 
         // Shorten and simplify the display if no habits have been added
         if (getIntFromPrefs(MAIN_PREFS, "num_habits", 0) == 0) {
@@ -200,22 +241,22 @@ public class MainActivity extends AppCompatActivity {
             adView.setVisibility(View.GONE);
 
             // Also hide habit stats
-            CardView cardView = (CardView)findViewById(R.id.stats_grid);
+            CardView cardView = findViewById(R.id.stats_grid);
             cardView.setVisibility(View.GONE);
         }
 
         // Initialise and load motivation text
-        textViewMotivation = (TextView) findViewById(R.id.textView_motivation);
+        textViewMotivation = findViewById(R.id.textView_motivation);
         loadNewMotivation();
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         // Show settings hint after day 3
-        if (main_log.getBoolean("show_settings_hint",true) &&
+        if (mainLog.getBoolean("show_settings_hint",true) &&
                 getIntFromPrefs(HABIT_PREFS+current_habit,"log_entry_2",-1) != -1) {
             // Only show hint once
-            SharedPreferences.Editor editor = main_log.edit();
+            SharedPreferences.Editor editor = mainLog.edit();
             editor.putBoolean("show_settings_hint",false);
             editor.apply();
             TapTargetView.showFor(this,
@@ -238,10 +279,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Show edit habit hint if at least 7 days completed
-        if (main_log.getBoolean("show_edit_hint",true) &&
+        if (mainLog.getBoolean("show_edit_hint",true) &&
+                !mainLog.getBoolean("show_settings_hint",true) &&
                 getIntFromPrefs(HABIT_PREFS+current_habit,"log_entry_6",-1) != -1) {
             // Only show hint once
-            SharedPreferences.Editor editor = main_log.edit();
+            SharedPreferences.Editor editor = mainLog.edit();
             editor.putBoolean("show_edit_hint",false);
             editor.apply();
             DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -268,6 +310,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void adVisibility(int v){
+        adView.setVisibility(v);
+        adButton.setVisibility(v);
+    }
+
     private void displayHabitContent(){
         int streak_longest = 0, streak_current = 0, days_fail = 0;
         int days_fail_legit = 0, days_success = 0;
@@ -275,7 +322,7 @@ public class MainActivity extends AppCompatActivity {
         String habit_summary = getStringFromPrefs(HABIT_PREFS + current_habit, "habit_summary",
                 getString(R.string.txt_habit));
         habit_summary = habit_summary.substring(0, 1).toUpperCase() + habit_summary.substring(1);
-        TextView textViewProgressReport = (TextView) findViewById(R.id.textView_progress_report);
+        TextView textViewProgressReport = findViewById(R.id.textView_progress_report);
         textViewProgressReport.setText(getString(R.string.txt_progress_report,habit_summary));
 
         if (current_habit != -1) {
@@ -482,13 +529,13 @@ public class MainActivity extends AppCompatActivity {
         builder.setTitle(getResources().getString(R.string.feedback_title));
         builder.setMessage(getResources().getString(R.string.feedback_msg));
 
-        builder.setPositiveButton(getResources().getString(R.string.btn_rate_app), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.btn_rate_app, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 rateApp();
             }
         });
 
-        builder.setNeutralButton(getResources().getString(R.string.btn_contact_us), new DialogInterface.OnClickListener() {
+        builder.setNeutralButton(R.string.btn_contact_us, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
                 emailIntent.setData(Uri.parse("mailto:dev.twinc@gmail.com?subject=EDH%20feedback"));
@@ -536,6 +583,8 @@ public class MainActivity extends AppCompatActivity {
         // Can't delete the button
         if (current_habit == -1) return;
 
+        // TODO: Somehow a user managed to get in here without an active habit. Result, habit_num==-1
+
         final SharedPreferences habit_log = getSharedPreferences(HABIT_PREFS+current_habit, 0);
 
         final String habitText = habit_log.getString("habit",getString(R.string.txt_habit));
@@ -543,7 +592,7 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(getResources().getString(R.string.txt_delete) + habitText);
 
-        builder.setPositiveButton(getString(R.string.btn_delete), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.btn_delete, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
 
                 // Remove notification
@@ -649,6 +698,11 @@ public class MainActivity extends AppCompatActivity {
             if (requestCode == SETTINGS_REQUEST){
                 // Legit preference could have changed. Update habit display.
                 displayHabitContent();
+                // User might have activated premium
+                SharedPreferences mainLog = getSharedPreferences(MAIN_PREFS, 0);
+                if (mainLog.getLong("premium",0L) - System.currentTimeMillis() > 0)
+                    adVisibility(View.GONE);
+
             }
             else if (requestCode == EDIT_HABIT_REQUEST){
                 SharedPreferences habit_log = getSharedPreferences(HABIT_PREFS+current_habit, 0);
@@ -702,7 +756,7 @@ public class MainActivity extends AppCompatActivity {
                             ConstraintLayout.LayoutParams.MATCH_PARENT,
                             (int) getResources().getDimension(R.dimen.fragment_height)));
 
-                    adView.setVisibility(View.VISIBLE);
+                    adVisibility(View.VISIBLE);
                 }
 
                 // Create shared preference log for new habit

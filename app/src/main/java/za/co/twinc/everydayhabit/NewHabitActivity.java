@@ -2,12 +2,15 @@ package za.co.twinc.everydayhabit;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
+
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,27 +21,38 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TimePicker;
 import android.support.v7.widget.Toolbar;
 
-public class NewHabitActivity extends AppCompatActivity {
+
+public class NewHabitActivity extends AppCompatActivity{
+
+    private EditText editTextHabit;
+    private RadioGroup radioGroup;
+    private Button buttonDone;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_habit);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null)
             actionBar.setDisplayHomeAsUpEnabled(true);
 
-        // Hide Button till a habit is entered
-        final Button buttonDone = (Button)findViewById(R.id.button_add_habit);
-        buttonDone.setEnabled(false);
+        //get habit data
+        editTextHabit = findViewById(R.id.editTextHabit);
 
-        EditText editTextHabit = (EditText)findViewById(R.id.editTextHabit);
+        // Initialise objects that are affected by the presence of data in the NEW HABIT field
+        radioGroup = findViewById(R.id.radioGroup);
+        buttonDone = findViewById(R.id.button_add_habit);
+
+        shouldShowObjects(false);
+
+        EditText editTextHabit = findViewById(R.id.editTextHabit);
         editTextHabit.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -48,9 +62,9 @@ public class NewHabitActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 if(charSequence.toString().trim().length()==0){
-                    buttonDone.setEnabled(false);
+                    shouldShowObjects(false);
                 } else {
-                    buttonDone.setEnabled(true);
+                    shouldShowObjects(true);
                 }
             }
 
@@ -62,6 +76,14 @@ public class NewHabitActivity extends AppCompatActivity {
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
+    }
+
+    private void shouldShowObjects(boolean show){
+        buttonDone.setEnabled(show);
+        if (show)
+            radioGroup.setVisibility(View.VISIBLE);
+        else
+            radioGroup.setVisibility(View.GONE);
     }
 
     @Override
@@ -79,8 +101,28 @@ public class NewHabitActivity extends AppCompatActivity {
     @SuppressWarnings("UnusedParameters")
     public void onButtonDoneClick(View view) {
         DialogFragment newFragment = new TimePickerFragment();
-        newFragment.show(getSupportFragmentManager(), "timePicker");
+        newFragment.show(getFragmentManager(),"timePicker");
     }
+
+    @SuppressWarnings("UnusedParameters")
+    public void onButtonSuggestionsClick(View view){
+        showRadioButtonDialog();
+    }
+
+    private void showRadioButtonDialog() {
+        final String[] values = getResources().getStringArray(R.array.habit_suggestions);
+        // custom dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.suggestions_button)
+                .setItems(values, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        editTextHabit.setText(values[i]);
+                    }
+                })
+                .create().show();
+    }
+
 
     public static class TimePickerFragment extends DialogFragment
             implements TimePickerDialog.OnTimeSetListener {
@@ -101,9 +143,8 @@ public class NewHabitActivity extends AppCompatActivity {
         }
 
         public void onTimeSet(TimePicker view, int hour, int minute) {
-            //get habit data
-            EditText editTextHabit = (EditText)getActivity().findViewById(R.id.editTextHabit);
-            RadioButton radioButtonTomorrow = (RadioButton) getActivity().findViewById(R.id.radioButtonTomorrow);
+            EditText editTextHabit = getActivity().findViewById(R.id.editTextHabit);
+            RadioButton radioButtonTomorrow = getActivity().findViewById(R.id.radioButtonTomorrow);
 
             //Return new habit details to main
             Intent requestIntent = getActivity().getIntent();

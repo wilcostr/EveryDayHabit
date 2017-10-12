@@ -118,4 +118,9 @@
     <string name="day_tip_text">Esta cuadrícula registrará tu formación de hábitos durante los siguientes 49 días</string>
     <string name="settings_tip_text">Cambiar notificaciones y otros ajustes de aplicación</string>
     <string name="edit_tip_title">Pulsa aquí para editar hábito</string>
+    <string name="ads_msg">Por favor, envíenos un correo electrónico para obtener prima</string>
+    <string name="ads_title">¿Por qué anuncios?</string>
+    <string name="button_why_ads">¿Por qué anuncios?</string>
+    <string name="suggestions_button">Sugerencias</string>
+    <string name="welcome_premium">Bienvenido a la experiencia premium</string>
 </resources>

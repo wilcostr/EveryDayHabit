@@ -1,5 +1,6 @@
 package za.co.twinc.everydayhabit;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -50,8 +51,8 @@ public class PageFragment extends Fragment {
         View view = inflater.inflate(R.layout.content_page_fragment, container, false);
         Bundle bundle = getArguments();
 
-        TextView textViewHabit = (TextView) view.findViewById(R.id.textView_swipe);
-        gridContent = (GridView) view.findViewById(R.id.content_grid);
+        TextView textViewHabit = view.findViewById(R.id.textView_swipe);
+        gridContent = view.findViewById(R.id.content_grid);
 
         int habitPosition = bundle.getInt("num");
         if (habitPosition+1 > getIntFromPrefs(getContext(),MAIN_PREFS,"num_habits",0)){
@@ -59,10 +60,10 @@ public class PageFragment extends Fragment {
             textViewHabit.setText(getString(R.string.txt_add_new_habit));
             gridContent.setVisibility(View.GONE);
 
-            ImageButton newHabitButton = (ImageButton) view.findViewById(R.id.button_new_habit);
+            ImageButton newHabitButton = view.findViewById(R.id.button_new_habit);
             newHabitButton.setVisibility(View.VISIBLE);
 
-            ImageButton editHabitButton = (ImageButton) view.findViewById(R.id.button_edit);
+            ImageButton editHabitButton = view.findViewById(R.id.button_edit);
             editHabitButton.setVisibility(View.GONE);
 
             newHabitButton.setOnClickListener(new View.OnClickListener() {
@@ -188,27 +189,30 @@ public class PageFragment extends Fragment {
                         public void run() {
                             // Only load one hint
                             if (showHint) {
-                                TapTargetView.showFor(getActivity(),
-                                        TapTarget.forView(gridContent.getChildAt(0), getString(R.string.day_tip_title),
-                                                getString(R.string.day_tip_text))
-                                        .drawShadow(true),
-                                        new TapTargetView.Listener() {          // The listener can listen for regular clicks, long clicks or cancels
-                                            @Override
-                                            public void onTargetClick(TapTargetView view) {
-                                                super.onTargetClick(view);
-                                                if (getNumDays(0)==-1)
-                                                    Toast.makeText(getContext(), getString(R.string.txt_cannot_tomorrow), Toast.LENGTH_SHORT).show();
-                                                else {
-                                                    // Log progress for first day: Send intent to EditDayActivity
-                                                    Intent editDay = new Intent(getContext(), EditDayActivity.class);
-                                                    editDay.putExtra("clicked_position", 0);
-                                                    editDay.putExtra("habit", getStringFromPrefs(getContext(), HABIT_PREFS + habitNum,
-                                                            "habit", getString(R.string.edit_day_default)));
-                                                    getActivity().startActivityForResult(editDay, EDIT_DAY_REQUEST);
+                                final Activity activity = getActivity();
+                                if (activity != null) {
+                                    TapTargetView.showFor(activity,
+                                            TapTarget.forView(gridContent.getChildAt(0), getString(R.string.day_tip_title),
+                                                    getString(R.string.day_tip_text))
+                                                    .drawShadow(true),
+                                            new TapTargetView.Listener() {          // The listener can listen for regular clicks, long clicks or cancels
+                                                @Override
+                                                public void onTargetClick(TapTargetView view) {
+                                                    super.onTargetClick(view);
+                                                    if (getNumDays(0) == -1)
+                                                        Toast.makeText(getContext(), getString(R.string.txt_cannot_tomorrow), Toast.LENGTH_SHORT).show();
+                                                    else {
+                                                        // Log progress for first day: Send intent to EditDayActivity
+                                                        Intent editDay = new Intent(getContext(), EditDayActivity.class);
+                                                        editDay.putExtra("clicked_position", 0);
+                                                        editDay.putExtra("habit", getStringFromPrefs(getContext(), HABIT_PREFS + habitNum,
+                                                                "habit", getString(R.string.edit_day_default)));
+                                                        activity.startActivityForResult(editDay, EDIT_DAY_REQUEST);
+                                                    }
                                                 }
-                                            }
-                                        });
-                                showHint = false;
+                                            });
+                                    showHint = false;
+                                }
                             }
                         }
                     }, 1000);

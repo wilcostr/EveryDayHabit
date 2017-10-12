@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string-array name="habit_suggestions">
+        <item>Move for 5 min (walk / run / stretch)</item>
+        <item>Do 15 push-ups or 30 sit-ups or 5 pull-ups</item>
+        <item>Amish hour (no screens) from 21:30</item>
+        <item>Meditate for 5 minutes</item>
+        <item>Replace one sugary drink with water</item>
+        <item>Floss between 5 teeth</item>
+        <item>Write down one thing to be grateful for</item>
+        <item>Ask partner how their day was</item>
+        <item>Read one page before bed</item>
+    </string-array>
+
 </resources>
