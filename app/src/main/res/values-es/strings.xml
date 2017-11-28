@@ -9,10 +9,10 @@
     <string name="action_edit_habit">Editar hábito</string>
     <string name="edit_day_activity_title">Progreso diario</string>
     <string name="edit_day_default">¿Has tenido un buen día?</string>
-    <string name="edit_day_did_you">"¿Realizaste "</string>
-    <string name="edit_day_today">" el día del hoy?"</string>
-    <string name="edit_day_yesterday">" el día de ayer?"</string>
-    <string name="edit_day_on">" el "</string>
+    <string name="edit_day_did_you">"¿Realizaste %s %s"</string>
+    <string name="edit_day_today">"el día del hoy?"</string>
+    <string name="edit_day_yesterday">"el día de ayer?"</string>
+    <string name="edit_day_on">"el "</string>
     <string name="edit_day_yes">Sí</string>
     <string name="edit_day_no">No</string>
     <string name="edit_day_why">¿Qué fue lo que pasó?</string>

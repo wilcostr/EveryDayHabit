@@ -98,8 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (startMainIntent != null) {
             current_habit = startMainIntent.getIntExtra("habit", -1);
-            long timeStart = getDateFromPrefs(HABIT_PREFS+current_habit);
-            long timeDiff = System.currentTimeMillis() - timeStart;
+            long timeDiff = System.currentTimeMillis() - getDateFromPrefs(HABIT_PREFS+current_habit);
             currentDay =  (int)TimeUnit.DAYS.convert(timeDiff,TimeUnit.MILLISECONDS);
             // Prevent intent from being read on rotate
             startMainIntent.removeExtra("habit");
@@ -112,9 +111,15 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
             // Send intent to EditDayActivity
             Intent editDay = new Intent(getApplicationContext(), EditDayActivity.class);
-            editDay.putExtra("clicked_position", currentDay);
             editDay.putExtra("habit", getStringFromPrefs(HABIT_PREFS+current_habit,
                     "habit",getString(R.string.edit_day_default)));
+            //Verify time of notification creation, so as not to edit future days
+            long notificationTimeDiff = startMainIntent.getLongExtra("notification_time",
+                    1490000000000L) - getDateFromPrefs(HABIT_PREFS+current_habit);
+            int notificationDay = (int)TimeUnit.DAYS.convert(notificationTimeDiff, TimeUnit.MILLISECONDS);
+            editDay.putExtra("clicked_position", notificationDay);
+            if (notificationDay == currentDay-1)
+                editDay.putExtra("day_string", getString(R.string.edit_day_yesterday));
 
             startActivityForResult(editDay, EDIT_DAY_REQUEST);
         }
@@ -321,7 +326,10 @@ public class MainActivity extends AppCompatActivity {
 
         String habit_summary = getStringFromPrefs(HABIT_PREFS + current_habit, "habit_summary",
                 getString(R.string.txt_habit));
-        habit_summary = habit_summary.substring(0, 1).toUpperCase() + habit_summary.substring(1);
+        if (habit_summary.length()>0)
+            habit_summary = habit_summary.substring(0, 1).toUpperCase() + habit_summary.substring(1);
+        else
+            habit_summary = "Habit";
         TextView textViewProgressReport = findViewById(R.id.textView_progress_report);
         textViewProgressReport.setText(getString(R.string.txt_progress_report,habit_summary));
 
@@ -481,6 +489,7 @@ public class MainActivity extends AppCompatActivity {
         sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareText);
 
         if (Build.VERSION.SDK_INT >= 22) {
+            // Share through a BroadcastReceiver to detect if sharing to Facebook
             Intent receiverIntent = new Intent(this, MotivationReceiver.class);
             receiverIntent.putExtra("Motivation",shareText);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, receiverIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -491,6 +500,7 @@ public class MainActivity extends AppCompatActivity {
         }
         else{
             // We cannot detect if Facebook was selected, so copy motivation to clipboard
+            // TODO: Remove code duplication of below functionality
             ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
             ClipData clip = ClipData.newPlainText("Motivation", shareText);
             clipboard.setPrimaryClip(clip);
@@ -900,10 +910,10 @@ public class MainActivity extends AppCompatActivity {
             if (s != null) {
                 s = s.replace("(","\n- ").replace(")","");
                 SpannableStringBuilder str = new SpannableStringBuilder(s);
-                int separatorIdx = s.indexOf('-');
+                int separatorIdx = s.lastIndexOf('-');
                 if (separatorIdx > -1)
                     str.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
-                            s.indexOf('-'), str.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            separatorIdx, str.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 textViewMotivation.setText(str);
             }
         }

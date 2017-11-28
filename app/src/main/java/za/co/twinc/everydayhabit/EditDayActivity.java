@@ -25,7 +25,7 @@ public class EditDayActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_day);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) actionBar.setDisplayHomeAsUpEnabled(true);
@@ -33,26 +33,26 @@ public class EditDayActivity extends AppCompatActivity {
         // Get intent data
         requestIntent = getIntent();
 
-        TextView textViewHabit = (TextView)findViewById(R.id.text_view_habit);
+        TextView textViewHabit = findViewById(R.id.text_view_habit);
         String dayString = requestIntent.getStringExtra("day_string");
         if (dayString == null)
             dayString = getString(R.string.edit_day_today);
-        textViewHabit.setText(getString(R.string.edit_day_did_you) +
-                requestIntent.getStringExtra("habit").toLowerCase() +
-                dayString);
+        textViewHabit.setText(getString(R.string.edit_day_did_you,
+                requestIntent.getStringExtra("habit").toLowerCase(),
+                dayString));
 
         // These start off invisible
-        final TextView textView2 = (TextView) findViewById(R.id.textView2);
-        final CheckBox checkBox = (CheckBox) findViewById(R.id.checkBox);
+        final TextView textView2 = findViewById(R.id.textView2);
+        final CheckBox checkBox = findViewById(R.id.checkBox);
 
-        final Button button_done = (Button) findViewById(R.id.button_done);
-        final EditText editText = (EditText) findViewById(R.id.editText);
+        final Button button_done = findViewById(R.id.button_done);
+        final EditText editText = findViewById(R.id.editText);
 
         String comment = requestIntent.getStringExtra("comment");
         if (comment != null && !comment.isEmpty() && !comment.equals(getString(R.string.txt_no_log)))
             editText.setText(comment);
 
-        final RadioGroup radioGroup = (RadioGroup) findViewById(R.id.radio_edit_day);
+        final RadioGroup radioGroup = findViewById(R.id.radio_edit_day);
 
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override

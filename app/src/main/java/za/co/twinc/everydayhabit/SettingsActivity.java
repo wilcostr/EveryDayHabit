@@ -104,57 +104,59 @@ public class SettingsActivity extends Activity {
             }catch (PackageManager.NameNotFoundException e){
                 versionName = "Not Found";
             }
-            p.setSummary(versionName);
-            p.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    // Reset if taking longer than two seconds
-                    if (System.currentTimeMillis() - clickTracker > 2000)
-                        clickCounter = 0;
+            if (p != null) {
+                p.setSummary(versionName);
+                p.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        // Reset if taking longer than two seconds
+                        if (System.currentTimeMillis() - clickTracker > 2000)
+                            clickCounter = 0;
 
-                    // Set the time of the first click of the sequence
-                    if (clickCounter == 0)
-                        clickTracker = System.currentTimeMillis();
+                        // Set the time of the first click of the sequence
+                        if (clickCounter == 0)
+                            clickTracker = System.currentTimeMillis();
 
-                    // This is the third click
-                    else if (clickCounter==2){
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                        final EditText input = new EditText(getActivity());
-                        //input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                        builder.setView(input);
+                            // This is the third click
+                        else if (clickCounter == 2) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                            final EditText input = new EditText(getActivity());
+                            //input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                            builder.setView(input);
 
-                        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (input.getText().toString().toLowerCase().equals("twincapps")) {
-                                    // Activate premium for a year, save the date in clickTracker
-                                    clickTracker += DateUtils.YEAR_IN_MILLIS;
-                                    SharedPreferences mainPrefs = getActivity().getSharedPreferences(
-                                            MainActivity.MAIN_PREFS, 0);
-                                    SharedPreferences.Editor editor = mainPrefs.edit();
-                                    editor.putLong("premium",clickTracker);
-                                    editor.apply();
+                            builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (input.getText().toString().toLowerCase().equals("twincapps")) {
+                                        // Activate premium for a year, save the date in clickTracker
+                                        clickTracker += DateUtils.YEAR_IN_MILLIS;
+                                        SharedPreferences mainPrefs = getActivity().getSharedPreferences(
+                                                MainActivity.MAIN_PREFS, 0);
+                                        SharedPreferences.Editor editor = mainPrefs.edit();
+                                        editor.putLong("premium", clickTracker);
+                                        editor.apply();
 
-                                    Toast.makeText(getActivity(), R.string.welcome_premium,Toast.LENGTH_LONG).show();
+                                        Toast.makeText(getActivity(), R.string.welcome_premium, Toast.LENGTH_LONG).show();
+                                    }
+
                                 }
+                            });
+                            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
 
-                            }
-                        });
-                        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
+                                }
+                            });
 
-                            }
-                        });
-
-                        builder.show();
+                            builder.show();
 
 
+                        }
+                        clickCounter++;
+                        return true;
                     }
-                    clickCounter++;
-                    return true;
-                }
-            });
+                });
+            }
 
             // Set notification tone
             p = preferenceManager.findPreference(KEY_PREF_NOTIFICATION_TONE);
@@ -165,20 +167,33 @@ public class SettingsActivity extends Activity {
                         .putString(KEY_PREF_NOTIFICATION_TONE, Settings.System.DEFAULT_NOTIFICATION_URI.toString())
                         .apply();
             }
-            Ringtone tone = RingtoneManager.getRingtone(getActivity(), Uri.parse(toneStr));
-            if (tone != null) p.setSummary(tone.getTitle(getActivity()));
-            else p.setSummary("None");
-            if (p.getSummary().equals("Unknown ringtone")) p.setSummary("None");
+
+            setRingtoneSummary(p, toneStr);
+
             // Update summary on change of notification tone
-            p.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object o) {
-                    Ringtone tone = RingtoneManager.getRingtone(getActivity(), Uri.parse((String)o));
+            if (p != null){
+                p.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object o) {
+                        return setRingtoneSummary(preference, (String)o);
+                    }
+                });
+            }
+        }
+
+        private boolean setRingtoneSummary(Preference preference, String summary){
+            Ringtone tone = RingtoneManager.getRingtone(getActivity(), Uri.parse(summary));
+            if (tone != null)
+                try {
                     preference.setSummary(tone.getTitle(getActivity()));
-                    if (preference.getSummary().equals("Unknown ringtone")) preference.setSummary("None");
-                    return true;
+                }catch (java.lang.SecurityException se){
+                    preference.setSummary("Unknown ringtone");
                 }
-            });
+            else
+                preference.setSummary("None");
+            if (preference.getSummary().equals("Unknown ringtone"))
+                preference.setSummary("None");
+            return true;
         }
 
         @Override

@@ -75,6 +75,7 @@ public class AlarmReceiver extends BroadcastReceiver
         // Create intent to open Main, load habit number in extras
         Intent openMainIntent = new Intent(context, MainActivity.class);
         openMainIntent.putExtra("habit", habitNum);
+        openMainIntent.putExtra("notification_time", System.currentTimeMillis());
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
         // Adds the back stack for the Intent (but not the Intent itself)

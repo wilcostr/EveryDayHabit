@@ -10,8 +10,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 /**
- * Created by wilco on 2017/07/10.
- * EveryDayHabit
+ * BroadcastReceiver to detect if sharing to Facebook
  */
 
 public class MotivationReceiver extends BroadcastReceiver {

@@ -14,10 +14,10 @@
 
     <string name="edit_day_activity_title">Daily progress</string>
     <string name="edit_day_default">Did you have a successful day?</string>
-    <string name="edit_day_did_you">"Did you "</string>
-    <string name="edit_day_today">" today?"</string>
-    <string name="edit_day_yesterday">" yesterday?"</string>
-    <string name="edit_day_on">" on "</string>
+    <string name="edit_day_did_you">"Did you %s %s"</string>
+    <string name="edit_day_today">"today?"</string>
+    <string name="edit_day_yesterday">"yesterday?"</string>
+    <string name="edit_day_on">"on "</string>
     <string name="edit_day_yes">Yes</string>
     <string name="edit_day_no">No</string>
     <string name="edit_day_why">Why were you unsuccessful?</string>
