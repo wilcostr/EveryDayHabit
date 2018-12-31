@@ -22,8 +22,9 @@ import android.view.View;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
-import static android.content.Context.NOTIFICATION_SERVICE;
 import static android.support.v4.app.NotificationCompat.CATEGORY_REMINDER;
+import static za.co.twinc.everydayhabit.MainActivity.PRIMARY_NOTIF_CHANNEL;
+import static za.co.twinc.everydayhabit.MainActivity.mNotifyMgr;
 
 /**
  * Created by wilco on 2017/02/02.
@@ -92,7 +93,7 @@ public class AlarmReceiver extends BroadcastReceiver
         Uri ringtoneUri = Uri.parse(ringtonePreference);
 
         // Create notification builder
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, PRIMARY_NOTIF_CHANNEL)
                 .setSmallIcon(R.drawable.small_icon)
                 .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher_edh))
                 .setContentTitle(context.getString(R.string.app_name))
@@ -117,7 +118,6 @@ public class AlarmReceiver extends BroadcastReceiver
         }
 
         // Issue notification
-        NotificationManager mNotifyMgr = (NotificationManager)context.getSystemService(NOTIFICATION_SERVICE);
         mNotifyMgr.notify(habitNum, notification);
     }
 

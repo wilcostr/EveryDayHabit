@@ -119,8 +119,7 @@ public class NewHabitActivity extends AppCompatActivity{
                     public void onClick(DialogInterface dialogInterface, int i) {
                         editTextHabit.setText(values[i]);
                     }
-                })
-                .create().show();
+                }).create().show();
     }
 
 

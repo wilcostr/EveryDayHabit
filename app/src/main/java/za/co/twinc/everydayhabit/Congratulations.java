@@ -15,7 +15,7 @@ public class Congratulations extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_congratulations);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) actionBar.setDisplayHomeAsUpEnabled(true);
@@ -25,7 +25,7 @@ public class Congratulations extends AppCompatActivity {
         String habitRate = intent.getStringExtra("rate");
         String habitStreak = intent.getStringExtra("streak");
 
-        TextView textView = (TextView)findViewById(R.id.textViewCongratulations);
+        TextView textView = findViewById(R.id.textViewCongratulations);
         textView.setText(getString(R.string.congratulations_text, habitText, habitRate, habitStreak));
     }
 

@@ -29,7 +29,7 @@ public class HabitSettings extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_settings);
-        Toolbar bar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar bar = findViewById(R.id.toolbar);
         bar.setTitle(getResources().getString(R.string.action_edit_habit));
         bar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,11 +89,6 @@ public class HabitSettings extends Activity {
             ((EditTextPreference)p).setText(intent.getStringExtra("habit_text"));
 
             // Set habit summary
-            p = preferenceManager.findPreference(KEY_PREF_HABIT_SUMMARY);
-            p.setSummary(intent.getStringExtra("habit_summary"));
-            ((EditTextPreference)p).setText(intent.getStringExtra("habit_summary"));
-
-            // Set habit notification time
             p = preferenceManager.findPreference(KEY_PREF_HABIT_SUMMARY);
             p.setSummary(intent.getStringExtra("habit_summary"));
             ((EditTextPreference)p).setText(intent.getStringExtra("habit_summary"));

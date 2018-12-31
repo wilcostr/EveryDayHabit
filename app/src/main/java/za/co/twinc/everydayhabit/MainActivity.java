@@ -1,5 +1,6 @@
 package za.co.twinc.everydayhabit;
 
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
@@ -80,6 +81,9 @@ public class MainActivity extends AppCompatActivity {
     private Button adButton;
     private static AlarmReceiver alarmReceiver;
 
+    public static NotificationManager mNotifyMgr;
+    public static final String PRIMARY_NOTIF_CHANNEL = "default";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,6 +94,14 @@ public class MainActivity extends AppCompatActivity {
 
         // Create main share preference log
         SharedPreferences mainLog = getSharedPreferences(MAIN_PREFS, 0);
+
+        // Create notification channel. No problem if already created previously
+        mNotifyMgr = (NotificationManager)getApplicationContext().getSystemService(NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    PRIMARY_NOTIF_CHANNEL, PRIMARY_NOTIF_CHANNEL, NotificationManager.IMPORTANCE_LOW);
+            mNotifyMgr.createNotificationChannel(channel);
+        }
 
         // Try to get intent that opened main (only the case when opened from notification)
         Intent startMainIntent = getIntent();
@@ -113,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
             Intent editDay = new Intent(getApplicationContext(), EditDayActivity.class);
             editDay.putExtra("habit", getStringFromPrefs(HABIT_PREFS+current_habit,
                     "habit",getString(R.string.edit_day_default)));
-            //Verify time of notification creation, so as not to edit future days
+            // Verify time of notification creation, so as not to edit future days
             long notificationTimeDiff = startMainIntent.getLongExtra("notification_time",
                     1490000000000L) - getDateFromPrefs(HABIT_PREFS+current_habit);
             int notificationDay = (int)TimeUnit.DAYS.convert(notificationTimeDiff, TimeUnit.MILLISECONDS);
@@ -731,7 +743,8 @@ public class MainActivity extends AppCompatActivity {
             }
             else if (requestCode == EDIT_DAY_REQUEST) {
                 // Cancel the notification if it is still visible
-                NotificationManager mNotifyMgr = (NotificationManager)getApplicationContext().getSystemService(NOTIFICATION_SERVICE);
+                if (mNotifyMgr == null)
+                    mNotifyMgr = (NotificationManager)getApplicationContext().getSystemService(NOTIFICATION_SERVICE);
                 mNotifyMgr.cancel(current_habit);
 
                 // Update habit_log
