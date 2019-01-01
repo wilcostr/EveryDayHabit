@@ -13,4 +13,14 @@
         <item>Read one page before bed</item>
     </string-array>
 
+    <string-array name="numbering_preference_labels">
+        <item>Calendar based</item>
+        <item>Habit based</item>
+    </string-array>
+
+    <string-array name="numbering_preference_vals">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
 </resources>

@@ -140,5 +140,6 @@
         \nIf you want to unlock the premium experience, we\'ll give it to you for free!
         Just send us an email. :)
     </string>
+    <string name="preference_number">Number preference</string>
 
 </resources>

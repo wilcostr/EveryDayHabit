@@ -847,7 +847,6 @@ public class MainActivity extends AppCompatActivity {
             habitTime += 24*60;
 
         alarmReceiver.setAlarm(ctx, habitText, habitNum, habitTime);
-
     }
 
     // Overload method for non-static calls

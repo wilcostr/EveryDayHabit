@@ -93,8 +93,10 @@ public class PageFragment extends Fragment {
         int[] log_entries = new int[NUM_LOG_ENTRIES];
         SharedPreferences habit_log = getContext().getSharedPreferences(HABIT_PREFS+habitNum, 0);
 
-        long timeDiff = System.currentTimeMillis() - habit_log.getLong("date", 1490000000000L);
+        long startTime = habit_log.getLong("date", 1490000000000L);
+        long timeDiff = System.currentTimeMillis() - startTime;
         long numDays =  TimeUnit.DAYS.convert(timeDiff,TimeUnit.MILLISECONDS);
+
 
         // Subtract offset from numDays
         numDays -= offset;
@@ -106,7 +108,7 @@ public class PageFragment extends Fragment {
         }
 
         // Initialise gridContent with latest log_entries
-        ImageAdapter imageAdapter = new ImageAdapter(getContext(), log_entries, offset);
+        ImageAdapter imageAdapter = new ImageAdapter(getContext(), log_entries, offset, startTime);
         gridContent.setAdapter(imageAdapter);
 
         gridContent.setOnItemClickListener(new AdapterView.OnItemClickListener() {

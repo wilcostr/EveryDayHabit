@@ -16,6 +16,13 @@
         android:title="@string/preference_accept_excuses"
         android:summaryOn="@string/preference_excuses_summary_on"
         android:summaryOff="@string/preference_excuses_summary_off"/>
+    <ListPreference
+        android:defaultValue="0"
+        android:entries="@array/numbering_preference_labels"
+        android:entryValues="@array/numbering_preference_vals"
+        android:key="number_preference"
+        android:title="@string/preference_number"
+        android:summary="%s"/>
     <Preference
         android:key="simple_text_about"
         android:selectAllOnFocus="true"

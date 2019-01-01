@@ -31,6 +31,7 @@ public class SettingsActivity extends Activity {
     public static final  String KEY_PREF_LEGIT_SWITCH =          "switch_preference_legit";
     public static final  String KEY_PREF_NOTIFICATION_TONE =     "ringtone_preference";
     private static final String KEY_PREF_ABOUT =                 "simple_text_about";
+    public static final String KEY_PREF_NUMBER =                 "number_preference";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,10 +148,7 @@ public class SettingsActivity extends Activity {
 
                                 }
                             });
-
                             builder.show();
-
-
                         }
                         clickCounter++;
                         return true;
