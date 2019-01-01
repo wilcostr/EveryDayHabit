@@ -29,11 +29,8 @@
 
     <string name="new_habit_activity_title">New habit</string>
     <string name="new_habit_1">Let\'s start a new habit!\n
-        \nMaking or breaking a habit takes conscious mental effort and perseverance, but the
-        pay off can be massive.\n
-        \nThink what it is that you want to achieve, reduce it to the
-        simplest possible daily activity that would take very little time and physical effort to
-        complete. Now complete the following sentence:\n
+        \nReduce your goal to the simplest possible daily activity, then
+        complete the following sentence:\n
     </string>
     <string name="new_habit_2">Every day, I am going to…\n</string>
     <string name="new_habit_notify_title">Notification time</string>
@@ -94,6 +91,8 @@
     <string name="first_use_button">Let\'s get started</string>
     <string name="first_use_text">Welcome to EveryDayHabit.\n
 
+        \nGet ready to change your life.\n
+
         \nHabits free up our mental capacity and energy by removing the need to make active
         decisions while performing habitual tasks. We can use the fact that our brains are
         constantly searching for behavioural patterns that can be automated to greatly improve
@@ -134,10 +133,9 @@
 
     <string name="button_why_ads">Why ads?</string>
     <string name="ads_title">Why Ads?</string>
-    <string name="ads_msg">We are working with Google to enable selling premium apps
-        by South African devs. Until then, ads are the only way for us to support
-        continuous development.\n
-        \nIf you want to unlock the premium experience, we\'ll give it to you for free!
+    <string name="ads_msg">We use ads to support our development, but will be adding an option
+        to pay to remove ads in the future.\n
+        \nIf you want to unlock the premium experience already, we\'ll give it to you for free!
         Just send us an email. :)
     </string>
     <string name="preference_number">Number preference</string>

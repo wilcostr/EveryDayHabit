@@ -123,4 +123,6 @@
     <string name="button_why_ads">¿Por qué anuncios?</string>
     <string name="suggestions_button">Sugerencias</string>
     <string name="welcome_premium">Bienvenido a la experiencia premium</string>
+    <string name="preference_number">numeración</string>
+    <string name="privacy_policy">política de privacidad</string>
 </resources>
