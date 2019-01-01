@@ -6,17 +6,9 @@
         android:orderInCategory="110"
         android:title="@string/action_settings" />
     <item
-        android:id="@+id/action_new_habit"
-        android:orderInCategory="102"
-        android:title="@string/action_new_habit"/>
-    <item
         android:id="@+id/action_delete_habit"
         android:orderInCategory="103"
         android:title="@string/action_delete_habit"/>
-    <item
-        android:id="@+id/action_edit_habit"
-        android:orderInCategory="104"
-        android:title="@string/action_edit_habit"/>
     <item
         android:id="@+id/action_start"
         android:orderInCategory="105"
@@ -25,4 +17,9 @@
         android:id="@+id/action_feedback"
         android:orderInCategory="106"
         android:title="@string/action_feedback" />
+    <item
+        android:id="@+id/menu_privacy_policy"
+        android:orderInCategory="107"
+        android:title="@string/privacy_policy"/>
+
 </menu>

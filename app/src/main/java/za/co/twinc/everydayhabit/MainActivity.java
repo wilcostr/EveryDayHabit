@@ -434,15 +434,8 @@ public class MainActivity extends AppCompatActivity {
                 Intent startSettings = new Intent(getApplicationContext(), SettingsActivity.class);
                 startActivityForResult(startSettings, SETTINGS_REQUEST);
                 return true;
-            case R.id.action_new_habit:
-                Intent newHabit = new Intent(getApplicationContext(), NewHabitActivity.class);
-                startActivityForResult(newHabit, NEW_HABIT_REQUEST);
-                return true;
             case R.id.action_delete_habit:
                 deleteHabit();
-                return true;
-            case R.id.action_edit_habit:
-                editHabit();
                 return true;
             case R.id.action_start:
                 Intent intent = new Intent(getApplicationContext(), FirstUseActivity.class);
@@ -450,6 +443,11 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.action_feedback:
                 feedback();
+                return true;
+            case R.id.menu_privacy_policy:
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("https://sites.google.com/view/twincapps-privacypolicy/home"));
+                startActivity(browserIntent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

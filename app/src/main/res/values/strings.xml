@@ -141,5 +141,6 @@
         Just send us an email. :)
     </string>
     <string name="preference_number">Number preference</string>
+    <string name="privacy_policy">Privacy policy</string>
 
 </resources>
