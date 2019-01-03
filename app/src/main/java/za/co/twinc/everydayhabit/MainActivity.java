@@ -37,7 +37,9 @@ import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -828,6 +830,17 @@ public class MainActivity extends AppCompatActivity {
                 habit_editor.putBoolean("showCongrats", false);
                 habit_editor.apply();
             }
+
+            // Scroll back to top of scrollView
+            final ScrollView mainScrollView = findViewById(R.id.main_scrollview);
+            // Wait until my scrollView is ready
+            mainScrollView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    // Ready, move up
+                    mainScrollView.fullScroll(View.FOCUS_UP);
+                }
+            });
         }
     }
 
