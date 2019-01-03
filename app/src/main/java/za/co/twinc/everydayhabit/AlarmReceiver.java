@@ -2,7 +2,6 @@ package za.co.twinc.everydayhabit;
 
 import android.app.AlarmManager;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -24,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import static android.support.v4.app.NotificationCompat.CATEGORY_REMINDER;
 import static za.co.twinc.everydayhabit.MainActivity.PRIMARY_NOTIF_CHANNEL;
+import static za.co.twinc.everydayhabit.MainActivity.initNotificationManager;
 import static za.co.twinc.everydayhabit.MainActivity.mNotifyMgr;
 
 /**
@@ -118,6 +118,8 @@ public class AlarmReceiver extends BroadcastReceiver
         }
 
         // Issue notification
+        if (mNotifyMgr == null)
+            initNotificationManager(context);
         mNotifyMgr.notify(habitNum, notification);
     }
 

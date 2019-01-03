@@ -96,12 +96,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences mainLog = getSharedPreferences(MAIN_PREFS, 0);
 
         // Create notification channel. No problem if already created previously
-        mNotifyMgr = (NotificationManager)getApplicationContext().getSystemService(NOTIFICATION_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(
-                    PRIMARY_NOTIF_CHANNEL, PRIMARY_NOTIF_CHANNEL, NotificationManager.IMPORTANCE_LOW);
-            mNotifyMgr.createNotificationChannel(channel);
-        }
+        initNotificationManager(getApplicationContext());
 
         // Try to get intent that opened main (only the case when opened from notification)
         Intent startMainIntent = getIntent();
@@ -241,12 +236,12 @@ public class MainActivity extends AppCompatActivity {
             adView.setAdListener(new AdListener(){
                 @Override
                 public void onAdLoaded(){
-                    adVisibility(View.VISIBLE);
+                    setAdVisibility(View.VISIBLE);
                 }
             });
         }
         else
-            adVisibility(View.GONE);
+            setAdVisibility(View.GONE);
 
         // Shorten and simplify the display if no habits have been added
         if (getIntFromPrefs(MAIN_PREFS, "num_habits", 0) == 0) {
@@ -327,9 +322,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void adVisibility(int v){
+    public void setAdVisibility(int v){
         adView.setVisibility(v);
         adButton.setVisibility(v);
+    }
+
+    public static void initNotificationManager(Context context){
+        mNotifyMgr = (NotificationManager)context.getSystemService(NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    PRIMARY_NOTIF_CHANNEL, PRIMARY_NOTIF_CHANNEL, NotificationManager.IMPORTANCE_LOW);
+            mNotifyMgr.createNotificationChannel(channel);
+        }
     }
 
     private void displayHabitContent(){
@@ -721,7 +725,7 @@ public class MainActivity extends AppCompatActivity {
                 // User might have activated premium
                 SharedPreferences mainLog = getSharedPreferences(MAIN_PREFS, 0);
                 if (mainLog.getLong("premium",0L) - System.currentTimeMillis() > 0)
-                    adVisibility(View.GONE);
+                    setAdVisibility(View.GONE);
 
             }
             else if (requestCode == EDIT_HABIT_REQUEST){
@@ -777,7 +781,7 @@ public class MainActivity extends AppCompatActivity {
                             ConstraintLayout.LayoutParams.MATCH_PARENT,
                             (int) getResources().getDimension(R.dimen.fragment_height)));
 
-                    adVisibility(View.VISIBLE);
+                    setAdVisibility(View.VISIBLE);
                 }
 
                 // Create shared preference log for new habit
