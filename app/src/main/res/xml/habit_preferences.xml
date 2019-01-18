@@ -30,4 +30,11 @@
         android:title="@string/preference_start_date"
         android:summary="NaN"/>
 
+    <Preference
+        android:key="simple_text_habit_delete"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/action_delete_habit"/>
+
+
 </PreferenceScreen>

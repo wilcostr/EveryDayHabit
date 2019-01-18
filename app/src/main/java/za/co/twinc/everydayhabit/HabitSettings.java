@@ -23,6 +23,7 @@ public class HabitSettings extends Activity {
     private static final String KEY_PREF_HABIT_SUMMARY =         "edit_text_preference_habit_summary";
     private static final String KEY_PREF_NOTIFICATION_TIME =     "time_picker_preference_notification";
     private static final String KEY_PREF_DATE =                  "simple_text_habit_date";
+    private static final String KEY_PREF_DELETE =                "simple_text_habit_delete";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +114,17 @@ public class HabitSettings extends Activity {
                     new TimePickerDialog(getActivity(), timeSetListener, hour, minute,
                             DateFormat.is24HourFormat(getActivity())).show();
                     return false;
+                }
+            });
+
+            // Delete habit
+            p = preferenceManager.findPreference(KEY_PREF_DELETE);
+            p.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    intent.putExtra("delete", true);
+                    getActivity().onBackPressed();
+                    return true;
                 }
             });
         }

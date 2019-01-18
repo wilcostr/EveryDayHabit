@@ -609,8 +609,6 @@ public class MainActivity extends AppCompatActivity {
         // Can't delete the button
         if (current_habit == -1) return;
 
-        // TODO: Somehow a user managed to get in here without an active habit. Result, habit_num==-1
-
         final SharedPreferences habit_log = getSharedPreferences(HABIT_PREFS+current_habit, 0);
 
         final String habitText = habit_log.getString("habit",getString(R.string.txt_habit));
@@ -744,6 +742,10 @@ public class MainActivity extends AppCompatActivity {
                 // Update display
                 swipeAdapter.notifyDataSetChanged();
                 displayHabitContent();
+
+                if (data.getBooleanExtra("delete", false)){
+                    deleteHabit();
+                }
             }
             else if (requestCode == EDIT_DAY_REQUEST) {
                 // Cancel the notification if it is still visible
